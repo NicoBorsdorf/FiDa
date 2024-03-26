@@ -1,0 +1,21 @@
+@model FiDa.Models.FileUpload
+@{
+ViewBag.Title = "File";
+}
+
+<h2>Details</h2>
+
+<div>
+    <h4>File</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.FileName)
+        </dt>
+        @*Markup omitted for clarity.*@
+    </dl>
+</div>
+<p>
+    @Html.ActionLink("Edit", "Edit", new { id = Model.ID }) |
+    @Html.ActionLink("Back to List", "Index")
+</p>
