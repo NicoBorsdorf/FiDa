@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("FiDa")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+4213835bd4fd627ceddc29b756dbe0b948267f91")]
 [assembly: System.Reflection.AssemblyProductAttribute("FiDa")]
 [assembly: System.Reflection.AssemblyTitleAttribute("FiDa")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
