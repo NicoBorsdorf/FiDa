@@ -1,19 +1,17 @@
-
 using FiDa.Models;
-using System.Net;
-using System.Web.Mvc;
+using Microsoft.AspNetCore.Mvc;
+//using System.Web.Mvc;
 
 namespace FiDa.Controllers
 {
     public class PCloudController : Controller
     {
-        private UploadedFileDBContext db = new UploadedFileDBContext();
         // 
         // GET: /pcloud/ 
 
         public ActionResult Index()
         {
-            return View(db.UploadedFiles.ToList());
+            return View(/*db.UploadedFiles.ToList()*/);
         }
 
         //
@@ -22,13 +20,13 @@ namespace FiDa.Controllers
         {
             if (fileId == null)
             {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+                return BadRequest("Bad Request");
             }
 
-            FileUpload file = db.UploadedFiles.Find(fileId);
+            FileUpload file = null;//db.UploadedFiles.Find(fileId);
             if (file == null)
             {
-                return HttpNotFound();
+                return NotFound();
             }
 
             return View(file);

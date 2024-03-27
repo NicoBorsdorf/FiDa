@@ -1,6 +1,3 @@
-using System;
-using System.Data.Entity;
-
 namespace FiDa.Models
 {
     public class FileUpload
@@ -12,10 +9,5 @@ namespace FiDa.Models
         public required double Size { get; set; }
         public required DateTime ModificationDate { get; set; }
         public required DateTime CreatedDate { get; set; }
-    }
-
-    public class UploadedFileDBContext : DbContext
-    {
-        public DbSet<FileUpload> UploadedFiles { get; set; }
     }
 }
