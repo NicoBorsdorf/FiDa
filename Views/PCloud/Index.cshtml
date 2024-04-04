@@ -1,15 +1,29 @@
-@{
-ViewData["Title"] = "pCloud";
-}
+@model IEnumerable<FiDa.Models.FileUpload>
+    @{
+    ViewData["Title"] = "pCloud";
+    }
 
-<div class="p-4">
-    <div class="pb-4 flex justify-between">
-        <span class="text-5xl font-semibold">pCloud</span>
-        <img src="/Public/pCloud.jpg" alt="pCloud" width="50" height="50" />
+    <div class="p-4">
+        <div class="pb-4 flex justify-between">
+            <span class="text-5xl font-semibold">pCloud</span>
+            <img src="/Public/pCloud.jpg" alt="pCloud" width="50" height="50" />
+        </div>
+        <hr class="bg-slate-600 rounded-full h-2" />
+        <div class="pt-8">
+            here will be a data table
+        </div>
+        <div>and here will be a upload button</div>
+
+        <table>
+            <tbody>
+                @foreach (var file in Model){
+                <tr>
+                    <td>@Html.DisplayFor(modelitem => file.FileName)</td>
+                    <td>@Html.DisplayFor(modelitem => file.Size)</td>
+                    <td>@Html.DisplayFor(modelitem => file.Host)</td>
+                    <td>@Html.DisplayFor(modelitem => file.ModificationDate)</td>
+                </tr>
+                }
+            </tbody>
+        </table>
     </div>
-    <hr class="bg-slate-600 rounded-full h-2" />
-    <div class="pt-8">
-        here will be a data table
-    </div>
-    <div>and here will be a upload button</div>
-</div>
