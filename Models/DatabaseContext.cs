@@ -13,6 +13,10 @@ namespace FiDa.Database
         {
         }
 
+        public FiDaDatabase()
+        {
+        }
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if (!optionsBuilder.IsConfigured)
@@ -23,6 +27,7 @@ namespace FiDa.Database
 
         // Db sets
         public DbSet<FileUpload> UploadedFiles { get; set; }
+        public DbSet<User> User { get; set; }
     }
 
 
@@ -33,6 +38,11 @@ namespace FiDa.Database
             using var context = new FiDaDatabase(
                 serviceProvider.GetRequiredService<
                     DbContextOptions<FiDaDatabase>>());
+
+            //check if db has been created
+            context.Database.EnsureDeleted();
+            context.Database.EnsureCreated();
+
             // Look for any FileUploads.
             if (context.UploadedFiles.Any())
             {
@@ -41,7 +51,6 @@ namespace FiDa.Database
             context.UploadedFiles.AddRange(
                 new FileUpload
                 {
-                    ID = 1,
                     FileName = "My first file",
                     Host = "pCloud",
                     Size = 13.23,
@@ -50,7 +59,6 @@ namespace FiDa.Database
                 },
                 new FileUpload
                 {
-                    ID = 2,
                     FileName = "My second file",
                     Host = "pCloud",
                     Size = 85.66,
@@ -59,7 +67,6 @@ namespace FiDa.Database
                 },
                 new FileUpload
                 {
-                    ID = 3,
                     FileName = "My third file",
                     Host = "pCloud",
                     Size = 23.40,
@@ -68,7 +75,6 @@ namespace FiDa.Database
                 },
                 new FileUpload
                 {
-                    ID = 4,
                     FileName = "My fourth file",
                     Host = "pCloud",
                     Size = 1.56,

@@ -1,14 +1,14 @@
 using FiDa.Database;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-builder.Services.AddControllersWithViews();
 // Database context
 builder.Services.AddDbContext<FiDaDatabase>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("FiDaDatabase")));
+
+// Add services to the container.
+builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
 
