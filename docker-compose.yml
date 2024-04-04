@@ -1,10 +1,33 @@
 version: "3.9"
+
+networks:
+  webapp:
+
 services:
+  app:
+    container_name: fida
+    image: ${DOCKER_REGISTRY-}fida
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+    environment:
+      - DB_HOST=db
+      - DB_NAME=FiDaDatabase
+      - DB_SA_PASSWORD=A&VeryComplex123Password
+    networks:
+      - webapp
+
   db:
     image: "mcr.microsoft.com/mssql/server:2019-latest"
     container_name: sql_server
     ports: # not actually needed, because the two services are on the same network
-      - "1401:1433"
+      - "8002:1433"
     environment:
       - ACCEPT_EULA=y
       - SA_PASSWORD=A&VeryComplex123Password
+    networks:
+      - webapp
