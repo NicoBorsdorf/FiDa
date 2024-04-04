@@ -1,7 +1,7 @@
 version: "3.9"
 services:
   db:
-    image: "mcr.microsoft.com/mssql/server:2022-latest"
+    image: "mcr.microsoft.com/mssql/server:2019-latest"
     container_name: sql_server
     ports: # not actually needed, because the two services are on the same network
       - "1401:1433"
