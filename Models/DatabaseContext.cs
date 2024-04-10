@@ -7,8 +7,8 @@ namespace FiDa.Database
 
     public class FiDaDatabase : DbContext
     {
-        private readonly IConfiguration _configuration;
 
+        private readonly IConfiguration _configuration;
         public FiDaDatabase(DbContextOptions<FiDaDatabase> options) : base(options)
         {
         }

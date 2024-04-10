@@ -3,17 +3,13 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Database context
-var dbHost = Environment.GetEnvironmentVariable("DB_HOST");
-var dbName = Environment.GetEnvironmentVariable("DB_NAME");
-var dbPassword = Environment.GetEnvironmentVariable("DB_SA_PASSWORD");
-var connectionString = $"Data Source={dbHost};Initial Catalog={dbName};User ID=sa;Password={dbPassword};Encrypt=false;";
-//Server=(localdb)\\mssqllocaldb;Database=MVC_Test.Data;Trusted_Connection=True;MultipleActiveResultSets=true
-builder.Services.AddDbContext<FiDaDatabase>(options =>
-    options.UseSqlServer(connectionString));
-
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+// Database context
+builder.Services.AddDbContext<FiDaDatabase>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("FiDaDatabase")));
+
 
 var app = builder.Build();
 
