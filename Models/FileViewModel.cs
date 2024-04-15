@@ -19,9 +19,7 @@ namespace FiDa.Models
         [Range(0, double.MaxValue, ErrorMessage = "Size must be a positive number")]
         public double Size { get; set; }
 
-        [Required(ErrorMessage = "ModificationDate is required")]
-        [DataType(DataType.DateTime, ErrorMessage = "ModificationDate must be a valid date and time")]
-        public DateTime ModificationDate { get; set; }
+        public DateTime ModificationDate { get; set; } = new DateTime();
 
         [Required(ErrorMessage = "CreatedDate is required")]
         [DataType(DataType.DateTime, ErrorMessage = "CreatedDate must be a valid date and time")]
@@ -33,9 +31,10 @@ namespace FiDa.Models
         [Key]
         public int Id { get; set; }
 
-        [Required(ErrorMessage = "ModificationDate is required")]
-        [DataType(DataType.DateTime, ErrorMessage = "ModificationDate must be a valid date and time")]
-        public DateTime ModificationDate { get; set; }
+        [Required(ErrorMessage = "Username is required.")]
+        public string Username { get; set; }
+
+        public DateTime ModificationDate { get; set; } = new DateTime();
 
         [Required(ErrorMessage = "CreatedDate is required")]
         [DataType(DataType.DateTime, ErrorMessage = "CreatedDate must be a valid date and time")]

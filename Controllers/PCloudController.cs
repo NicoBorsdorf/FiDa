@@ -27,7 +27,7 @@ namespace FiDa.Controllers
                 return BadRequest("Bad Request");
             }
 
-            FileUpload file = db.UploadedFiles.Find(fileId);
+            FileUpload? file = db.UploadedFiles.Find(fileId);
             if (file == null)
             {
                 return NotFound();

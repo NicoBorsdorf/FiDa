@@ -11,7 +11,7 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-      - "8080:8080"
+      - "8080:80"
     depends_on:
       - db
     networks:
@@ -21,7 +21,7 @@ services:
     image: "mcr.microsoft.com/mssql/server:2019-latest"
     container_name: sql_server
     ports: # not actually needed, because the two services are on the same network
-      - "1433:1433"
+      - "1401:1433"
     environment:
       - ACCEPT_EULA=y
       - SA_PASSWORD=A&VeryComplex123Password

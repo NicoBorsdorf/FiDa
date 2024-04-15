@@ -21,7 +21,7 @@ namespace FiDa.Database
         {
             if (!optionsBuilder.IsConfigured)
             {
-                optionsBuilder.UseSqlServer(_configuration.GetConnectionString("FiDaDatabase"));
+                optionsBuilder.UseSqlServer("Data Source=sql_server,1433;Initial Catalog=FiDaDatabase;User Id=sa;Password=A&VeryComplex123Password;Integrated Security=false;TrustServerCertificate=true;");
             }
         }
 
