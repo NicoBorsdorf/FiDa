@@ -11,12 +11,30 @@ namespace FiDa.Controllers
 
         // 
         // GET: /pcloud/ 
-        public ActionResult Index()
+        public ActionResult Index(IFormFile? file)
         {
             List<FileUpload> files = db.UploadedFiles.ToList();
             Console.WriteLine(files);
+
+            if (file != null)
+            {
+                try
+                {
+                    if (file.Length > 0)
+                    {
+
+                    }
+                    ViewBag.Message = "File Uploaded Successfully!!";
+                }
+                catch
+                {
+                    ViewBag.Message = "File upload failed!!";
+                }
+            }
+
             return View(files);
         }
+
 
         //
         // GET: /pcloud/{fileId}
