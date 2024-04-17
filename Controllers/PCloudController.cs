@@ -1,7 +1,8 @@
 using FiDa.Database;
 using FiDa.Models;
 using Microsoft.AspNetCore.Mvc;
-//using System.Web.Mvc;
+using pcloud_sdk_csharp.Controllers;
+using pcloud_sdk_csharp.Requests;
 
 namespace FiDa.Controllers
 {
@@ -11,28 +12,43 @@ namespace FiDa.Controllers
 
         // 
         // GET: /pcloud/ 
-        public ActionResult Index(IFormFile? file)
+        public ActionResult Index()
         {
             List<FileUpload> files = db.UploadedFiles.ToList();
-            Console.WriteLine(files);
+            return View(files);
+        }
 
-            if (file != null)
+        [HttpPost]
+        public ActionResult UploadFile(IFormFile[] files)
+        {
+            Console.WriteLine("length " + files.Length);
+            if (files != null && files.Length > 0)
             {
-                try
+                foreach (var file in files)
                 {
-                    if (file.Length > 0)
+                    try
                     {
-
+                        throw new Exception("sdafgh");
+                        StreamReader _file = new(file.OpenReadStream());
+                        UploadFileRequest req = new(0, file.FileName, _file);
+                        var res = FileController.UploadFile(req, "64qbZMEJjKgdvE57ZUI7t7kZCApm81pUrChgxtJQwE7BBHjgQbJV").Result;
+                        Console.WriteLine(res);
+                        ViewBag.Message = "File Uploaded Successfully!!";
                     }
-                    ViewBag.Message = "File Uploaded Successfully!!";
-                }
-                catch
-                {
-                    ViewBag.Message = "File upload failed!!";
+                    catch
+                    {
+                        Console.WriteLine("filename " + file.FileName);
+                        ViewBag.Message += $"File upload failed for file: {file.FileName} <br />";
+                    }
                 }
             }
+            else
+            {
+                ViewBag.Message = "Please select a file.";
+                return PartialView("_UploadFile");
+            }
 
-            return View(files);
+            return View("Index");
         }
 
 

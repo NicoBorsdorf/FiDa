@@ -7,8 +7,6 @@ namespace FiDa.Database
 
     public class FiDaDatabase : DbContext
     {
-
-        private readonly IConfiguration _configuration;
         public FiDaDatabase(DbContextOptions<FiDaDatabase> options) : base(options)
         {
         }
@@ -21,7 +19,8 @@ namespace FiDa.Database
         {
             if (!optionsBuilder.IsConfigured)
             {
-                optionsBuilder.UseSqlServer("Data Source=sql_server,1433;Initial Catalog=FiDaDatabase;User Id=sa;Password=A&VeryComplex123Password;Integrated Security=false;TrustServerCertificate=true;");
+                //optionsBuilder.UseSqlServer("Data Source=sql_server,1433;Initial Catalog=FiDaDatabase;User Id=sa;Password=A&VeryComplex123Password;Integrated Security=false;TrustServerCertificate=true;");
+                optionsBuilder.UseSqlite(@"Data Source =.\\Data\\SQlLiteDatabase.db");
             }
         }
 
@@ -54,32 +53,32 @@ namespace FiDa.Database
                     FileName = "My first file",
                     Host = "pCloud",
                     Size = 13.23,
-                    ModificationDate = new DateTime(),
-                    CreatedDate = new DateTime(),
+                    ModificationDate = DateTime.Now,
+                    CreatedDate = DateTime.Now,
                 },
                 new FileUpload
                 {
                     FileName = "My second file",
                     Host = "pCloud",
                     Size = 85.66,
-                    ModificationDate = new DateTime(),
-                    CreatedDate = new DateTime(),
+                    ModificationDate = DateTime.Now,
+                    CreatedDate = DateTime.Now,
                 },
                 new FileUpload
                 {
                     FileName = "My third file",
                     Host = "pCloud",
                     Size = 23.40,
-                    ModificationDate = new DateTime(),
-                    CreatedDate = new DateTime(),
+                    ModificationDate = DateTime.Now,
+                    CreatedDate = DateTime.Now,
                 },
                 new FileUpload
                 {
                     FileName = "My fourth file",
                     Host = "pCloud",
                     Size = 1.56,
-                    ModificationDate = new DateTime(),
-                    CreatedDate = new DateTime(),
+                    ModificationDate = DateTime.Now,
+                    CreatedDate = DateTime.Now,
                 }
             );
             context.SaveChanges();
