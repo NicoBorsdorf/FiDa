@@ -45,10 +45,8 @@ namespace FiDa.Controllers
             else
             {
                 ViewBag.Message = "Please select a file.";
-                return PartialView("_UploadFile");
             }
-
-            return View("Index");
+            return PartialView("_UploadFile");
         }
 
 
