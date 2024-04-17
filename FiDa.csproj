@@ -19,7 +19,7 @@
 
   <ItemGroup>
     <Reference Include="pcloud-sdk-csharp">
-      <HintPath>..\ClassLibrary1\ClassLibrary1\bin\Debug\net6.0\pcloud-sdk-csharp.dll</HintPath>
+      <HintPath>/lib/pcloud-sdk-csharp.dll</HintPath>
     </Reference>
   </ItemGroup>
 
