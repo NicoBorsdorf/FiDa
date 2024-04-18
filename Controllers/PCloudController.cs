@@ -19,53 +19,31 @@ namespace FiDa.Controllers
         }
 
         [HttpPost]
-        public ActionResult UploadFile(IFormFile[] files)
+        public ActionResult UploadFile(IFormCollection form)
         {
-            Console.WriteLine("length " + files.Length);
-            if (files != null && files.Length > 0)
+            var folderId = form["Folder"];
+            var files = form["Files"].ToArray();
+
+            foreach (var file in files)
             {
-                foreach (var file in files)
+                Console.WriteLine("")
+                try
                 {
-                    try
-                    {
-                        throw new Exception("sdafgh");
-                        StreamReader _file = new(file.OpenReadStream());
-                        UploadFileRequest req = new(0, file.FileName, _file);
-                        var res = FileController.UploadFile(req, "64qbZMEJjKgdvE57ZUI7t7kZCApm81pUrChgxtJQwE7BBHjgQbJV").Result;
-                        Console.WriteLine(res);
-                        ViewBag.Message = "File Uploaded Successfully!!";
-                    }
-                    catch
-                    {
-                        Console.WriteLine("filename " + file.FileName);
-                        ViewBag.Message += $"File upload failed for file: {file.FileName} <br />";
-                    }
+                    throw new Exception("sdafgh");
+                    StreamReader _file = new(file.OpenReadStream());
+                    UploadFileRequest req = new(0, file.FileName, _file);
+                    var res = FileController.UploadFile(req, "64qbZMEJjKgdvE57ZUI7t7kZCApm81pUrChgxtJQwE7BBHjgQbJV").Result;
+                    Console.WriteLine(res);
+                    ViewBag.Message = "File Uploaded Successfully!!";
+                }
+                catch
+                {
+                    Console.WriteLine("filename " + file.FileName);
+                    ViewBag.Message += $"File upload failed for file: {file.FileName} <br />";
                 }
             }
-            else
-            {
-                ViewBag.Message = "Please select a file.";
-            }
-            return PartialView("_UploadFile");
-        }
 
-
-        //
-        // GET: /pcloud/{fileId}
-        public ActionResult FileView(int? fileId)
-        {
-            if (fileId == null)
-            {
-                return BadRequest("Bad Request");
-            }
-
-            FileUpload? file = db.UploadedFiles.Find(fileId);
-            if (file == null)
-            {
-                return NotFound();
-            }
-
-            return View(file);
+            return View("Index");
         }
     }
 }
