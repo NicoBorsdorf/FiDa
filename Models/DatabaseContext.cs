@@ -19,8 +19,8 @@ namespace FiDa.Database
         {
             if (!optionsBuilder.IsConfigured)
             {
-                //optionsBuilder.UseSqlServer("Data Source=sql_server,1433;Initial Catalog=FiDaDatabase;User Id=sa;Password=A&VeryComplex123Password;Integrated Security=false;TrustServerCertificate=true;");
-                optionsBuilder.UseSqlite(@"Data Source =.\\Data\\SQlLiteDatabase.db");
+                optionsBuilder.UseSqlServer("Data Source=sql_server,1433;Initial Catalog=FiDaDatabase;User Id=sa;Password=A&VeryComplex123Password;Integrated Security=false;TrustServerCertificate=true;");
+                //optionsBuilder.UseSqlite(@"Data Source =.\\Data\\SQlLiteDatabase.db");
             }
         }
 

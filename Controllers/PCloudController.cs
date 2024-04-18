@@ -21,26 +21,27 @@ namespace FiDa.Controllers
         [HttpPost]
         public ActionResult UploadFile(IFormCollection form)
         {
-            var folderId = form["Folder"];
-            var files = form["Files"].ToArray();
+            int folderId = int.Parse(form["Folder"]);
+            IFormFile[] files = form.Files.ToArray();
 
             foreach (var file in files)
             {
-                Console.WriteLine("")
-                try
-                {
-                    throw new Exception("sdafgh");
-                    StreamReader _file = new(file.OpenReadStream());
-                    UploadFileRequest req = new(0, file.FileName, _file);
-                    var res = FileController.UploadFile(req, "64qbZMEJjKgdvE57ZUI7t7kZCApm81pUrChgxtJQwE7BBHjgQbJV").Result;
-                    Console.WriteLine(res);
-                    ViewBag.Message = "File Uploaded Successfully!!";
-                }
-                catch
-                {
-                    Console.WriteLine("filename " + file.FileName);
-                    ViewBag.Message += $"File upload failed for file: {file.FileName} <br />";
-                }
+                Console.WriteLine("file " + file.FileName);
+                //try
+                //{
+                StreamReader _file = new(file.OpenReadStream());
+                UploadFileRequest req = new(folderId, file.FileName, _file);
+                var res = FileController.UploadFile(req, "64qbZMEJjKgdvE57ZUI7t7kZCApm81pUrChgxtJQwE7BBHjgQbJV");
+                res.Wait();
+
+                Console.WriteLine(res.Result);
+                ViewBag.Message = "File Uploaded Successfully!!";
+                //}
+                //catch (Exception e)
+                //{
+                //    Console.WriteLine($"Exception for {file.FileName} occured: {e.Message}");
+                //    ViewBag.Message += $"File upload failed for file: {file.FileName} <br />";
+                //}
             }
 
             return View("Index");
