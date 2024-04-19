@@ -13,13 +13,18 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="6.0.28">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
+      <TreatAsUsed>true</TreatAsUsed>
     </PackageReference>
     <PackageReference Include="System.Text.Json" Version="8.0.3" />
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Lib\" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Reference Include="pcloud-sdk-csharp">
-      <HintPath>/lib/pcloud-sdk-csharp.dll</HintPath>
+      <HintPath>..\ClassLibrary1\ClassLibrary1\bin\Debug\net6.0\pcloud-sdk-csharp.dll</HintPath>
     </Reference>
   </ItemGroup>
 
