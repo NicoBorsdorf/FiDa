@@ -28,19 +28,17 @@ namespace FiDa.Controllers
         //[HttpPost]
         public ActionResult UploadFile(IFormCollection form)
         {
-            Console.WriteLine("folder " + form["Folder"]);
-            int folderId = int.Parse(form["Folder"]);
+            long folderId = int.Parse(form["Folder"]);
             IFormFile[] files = form.Files.ToArray();
 
             foreach (var file in files)
             {
                 try
                 {
-                    UploadFileRequest req = new(folderId, file.FileName, file.OpenReadStream(), null);
-
+                    UploadFileRequest req = new(folderId, file.FileName, file.OpenReadStream());
                     var res = FileController.UploadFile(req, _config["API_Tokens:PCloud"]).Result;
 
-                    Console.WriteLine(JsonSerializer.Serialize(res));
+                    if (res.result != 0 && res.error != null) throw new Exception("PCloud returned an exception: " + res.error);
 
                     ViewBag.Message = "File Uploaded Successfully!!";
                 }
