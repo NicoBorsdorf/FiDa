@@ -35,25 +35,24 @@
 
 	<div class="py-4">
 		<!-- Modal toggle -->
-		<button data-modal-target="static-modal" data-modal-toggle="static-modal"
-				class="block text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+		<button class="block text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
 				type="button" id="toggle-modal-button">
 			Upload a file!
 		</button>
 	</div>
 
+
 	<!-- Main modal -->
 	<div id="static-modal" data-modal-backdrop="static" tabindex="-1" aria-hidden="true"
-		 class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
+		 class="overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
 		<div class="m-auto p-4 w-full max-w-2xl max-h-full">
 			<!-- Modal content -->
-			<partial name="../Shared/_UploadFile.cshtml" />
+			<div id="modal-content" class="relative bg-white rounded-lg shadow dark:bg-gray-700 antialiased"></div>
 		</div>
-
 	</div>
 
-
 	<script>
+		/*
 		["toggle-modal-button", "close-modal-button", "cancel-upload-button"].forEach((id) => {
 			document.getElementById(id).addEventListener("click", () => {
 				const classes = document.getElementById("static-modal").classList;
@@ -61,6 +60,32 @@
 					? classes.remove(classes.remove("hidden"))
 					: classes.add("hidden");
 			})
+		})*/
+		$(function() {
+			$("#toggle-modal-button").click(function() {
+				$.ajax({
+					type: "POST",
+					url: @Url.Action("UploadFile", "pcloud"),
+					contentType: "application/json; charset=utf-8",
+					data: null,
+					datatype: "json",
+					success: function(data) {
+						$('#modal-content').html(data);
+						$('#static-modal').modal({ "backdrop": "static", keyboard: true });
+						$('#static-modal').modal('show');
+
+					},
+					error: function() {
+						alert("Dynamic content load failed.");
+					}
+				});
+			});
+			//$("#closebtn").on('click',function(){
+			//    $('#myModal').modal('hide');
+
+			$("#close-modal-button").click(function() {
+				$('#static-modal').modal('hide');
+			});
 		})
 	</script>
 

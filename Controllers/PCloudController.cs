@@ -26,31 +26,32 @@ namespace FiDa.Controllers
         }
 
         //[HttpPost]
-        public ActionResult UploadFile(IFormCollection form)
+        public ActionResult UploadFile(IFormCollection? form)
         {
-            long folderId = int.Parse(form["Folder"]);
-            IFormFile[] files = form.Files.ToArray();
-
-            foreach (var file in files)
+            if (form != null && form.Count > 0)
             {
-                try
-                {
-                    UploadFileRequest req = new(folderId, file.FileName, file.OpenReadStream());
-                    var res = FileController.UploadFile(req, _config["API_Tokens:PCloud"]).Result;
+                long folderId = int.Parse(form["Folder"]);
+                IFormFile[] files = form.Files.ToArray();
 
-                    if (res.result != 0 && res.error != null) throw new Exception("PCloud returned an exception: " + res.error);
-
-                    ViewBag.Message = "File Uploaded Successfully!!";
-                }
-                catch (Exception e)
+                foreach (var file in files)
                 {
-                    Console.Error.WriteLine(e.Message);
-                    //Console.WriteLine($"Exception for {file.FileName} occured: {e.Message}");
-                    //ViewBag.Message += $"File upload failed for file: {file.FileName} <br />";
+                    try
+                    {
+                        UploadFileRequest req = new(folderId, file.FileName, file.OpenReadStream());
+                        var res = FileController.UploadFile(req, _config["API_Tokens:PCloud"]).Result;
+
+                        if (res == null || (res.result != 0 && res.error != null)) throw new Exception("PCloud returned an exception: " + res?.error);
+
+                        ViewBag.Message = "File Uploaded Successfully!!";
+                    }
+                    catch (Exception e)
+                    {
+                        Console.Error.WriteLine(e.Message);
+                        ViewBag.Message += $"File upload failed for file: {file.FileName} <br />";
+                    }
                 }
             }
-
-            return View("Index");
+            return PartialView("_UploadFile");
         }
     }
 }
