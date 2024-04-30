@@ -24,6 +24,13 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="wwwroot\Public\Avatar.png" />
+    <None Include="wwwroot\Public\DropBox.jpeg" />
+    <None Include="wwwroot\Public\OneDrive.jpg" />
+    <None Include="wwwroot\Public\pCloud.jpg" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Reference Include="pcloud-sdk-csharp">
       <HintPath>..\ClassLibrary1\ClassLibrary1\bin\Debug\net6.0\pcloud-sdk-csharp.dll</HintPath>
     </Reference>

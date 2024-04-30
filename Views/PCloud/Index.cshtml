@@ -6,7 +6,7 @@
 <div class="p-4">
 	<div class="pb-4 flex justify-between">
 		<span class="text-5xl font-semibold">pCloud</span>
-		<img src="/Public/pCloud.jpg" alt="pCloud" width="50" height="50" />
+		<img src="~/Public/pCloud.jpg" alt="pCloud" width="50" height="50" />
 	</div>
 	<hr class="bg-slate-600 rounded-full h-2" />
 
@@ -29,6 +29,15 @@
 				</tr>
 			</thead>
 			<tbody>
+				@foreach (var file in Model)
+				{
+					<tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+						<td class="px-6 py-4">@Html.DisplayFor(modelitem => file.FileName)</td>
+						<td class="px-6 py-4">@Html.DisplayFor(modelitem => file.Size)</td>
+						<td class="px-6 py-4">@Html.DisplayFor(modelitem => file.Host)</td>
+						<td class="px-6 py-4">@Html.DisplayFor(modelitem => file.ModificationDate)</td>
+					</tr>
+				}
 			</tbody>
 		</table>
 	</div>
@@ -36,43 +45,43 @@
 	<div class="py-4">
 		<!-- Modal toggle -->
 		<button class="block text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-				type="button" id="toggle-modal-button">
+				type="button" id="toggle-modal-button" name="toggle-modal-button">
 			Upload a file!
 		</button>
 	</div>
 
-
 	<!-- Main modal -->
 	<div id="static-modal" data-modal-backdrop="static" tabindex="-1" aria-hidden="true"
-		 class="overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
+		 class="overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full"
+		 style="display: none;">
 		<div class="m-auto p-4 w-full max-w-2xl max-h-full">
 			<!-- Modal content -->
-			<div id="modal-content" class="relative bg-white rounded-lg shadow dark:bg-gray-700 antialiased"></div>
+			<div id="modal-content" name="modal-content" class="relative bg-white rounded-lg shadow dark:bg-gray-700 antialiased"></div>
 		</div>
 	</div>
 
-	<script>
+	<script type="text/javascript">
 		/*
 		["toggle-modal-button", "close-modal-button", "cancel-upload-button"].forEach((id) => {
-			document.getElementById(id).addEventListener("click", () => {
-				const classes = document.getElementById("static-modal").classList;
-				classes.contains("hidden")
-					? classes.remove(classes.remove("hidden"))
-					: classes.add("hidden");
-			})
+		document.getElementById(id).addEventListener("click", () => {
+		const classes = document.getElementById("static-modal").classList;
+		classes.contains("hidden")
+		? classes.remove(classes.remove("hidden"))
+		: classes.add("hidden");
+		})
 		})*/
-		$(function() {
+		$(document).ready(function() {
 			$("#toggle-modal-button").click(function() {
 				$.ajax({
 					type: "POST",
-					url: @Url.Action("UploadFile", "pcloud"),
+					url: "/pcloud/UploadFile",
 					contentType: "application/json; charset=utf-8",
 					data: null,
 					datatype: "json",
 					success: function(data) {
 						$('#modal-content').html(data);
-						$('#static-modal').modal({ "backdrop": "static", keyboard: true });
-						$('#static-modal').modal('show');
+						//$('#static-modal').modal({ "backdrop": "static", keyboard: true });
+						$('#static-modal').show();
 
 					},
 					error: function() {
@@ -86,7 +95,7 @@
 			$("#close-modal-button").click(function() {
 				$('#static-modal').modal('hide');
 			});
-		})
+		});
 	</script>
 
 </div>

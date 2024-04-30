@@ -18,6 +18,9 @@ namespace FiDa.Models
         [Required(ErrorMessage = "Size is required")]
         [Range(0, double.MaxValue, ErrorMessage = "Size must be a positive number")]
         public double Size { get; set; }
+        [Required(ErrorMessage = "A Parent Folder id is required.")]
+        [Range(0, long.MaxValue)]
+        public long ParentFolderId { get; set; }
 
         public DateTime ModificationDate { get; set; } = new DateTime();
 

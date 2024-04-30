@@ -1,5 +1,4 @@
 ﻿@{
-	Layout = "/Views/Shared/_Layout.cshtml";
 	ViewData["Title"] = "Upload a file";
 }
 
@@ -36,6 +35,10 @@
 			</select>
 			<input class="block w-full text-sm font-medium text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400"
 			   id="Files" name="Files" type="file" multiple="multiple" required>
+			@if (@ViewBag.Message != null)
+			{
+				<p class="p-2 text-red-400">@ViewBag.Message</p>
+			}
 		</div>
 		<!-- Modal footer -->
 		<div class="flex items-center border-t border-gray-200 rounded-b dark:border-gray-600">
@@ -52,4 +55,23 @@
 			</div>
 		</div>
 	}
+	<script type="text/javascript">
+		/*
+		["toggle-modal-button", "close-modal-button", "cancel-upload-button"].forEach((id) => {
+		document.getElementById(id).addEventListener("click", () => {
+		const classes = document.getElementById("static-modal").classList;
+		classes.contains("hidden")
+		? classes.remove(classes.remove("hidden"))
+		: classes.add("hidden");
+		})
+		})*/
+		$(document).ready(function() {
+			$("#close-modal-button").click(function() {
+				$('#static-modal').hide();
+			});
+			$("#cancel-upload-button").click(function() {
+				$('#static-modal').hide();
+			});
+		});
+	</script>
 </div>
