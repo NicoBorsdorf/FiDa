@@ -54,7 +54,6 @@ namespace FiDa.Database
                     Host = "pCloud",
                     Size = 13.23,
                     ModificationDate = DateTime.Now,
-                    CreatedDate = DateTime.Now,
                 },
                 new FileUpload
                 {
@@ -62,7 +61,6 @@ namespace FiDa.Database
                     Host = "pCloud",
                     Size = 85.66,
                     ModificationDate = DateTime.Now,
-                    CreatedDate = DateTime.Now,
                 },
                 new FileUpload
                 {
@@ -70,7 +68,6 @@ namespace FiDa.Database
                     Host = "pCloud",
                     Size = 23.40,
                     ModificationDate = DateTime.Now,
-                    CreatedDate = DateTime.Now,
                 },
                 new FileUpload
                 {
@@ -78,7 +75,6 @@ namespace FiDa.Database
                     Host = "pCloud",
                     Size = 1.56,
                     ModificationDate = DateTime.Now,
-                    CreatedDate = DateTime.Now,
                 }
             );
             context.SaveChanges();
