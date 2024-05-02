@@ -33,7 +33,7 @@ namespace FiDa.Models
         [DisplayFormat(DataFormatString = "{0:dd.MM.yyyy HH:mm}")]
         public DateTime ModificationDate { get; set; } = DateTime.Now;
         [DisplayFormat(DataFormatString = "{0:dd.MM.yyyy HH:mm}")]
-        public DateTime CreatedDate { get; } = DateTime.Now;
+        public DateTime CreatedDate { get; set; } = DateTime.Now;
     }
 
     public class User

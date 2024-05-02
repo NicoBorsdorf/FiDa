@@ -19,8 +19,8 @@ namespace FiDa.Database
         {
             if (!optionsBuilder.IsConfigured)
             {
-                //optionsBuilder.UseSqlServer("Data Source=sql_server,1433;Initial Catalog=FiDaDatabase;User Id=sa;Password=A&VeryComplex123Password;Integrated Security=false;TrustServerCertificate=true;");
-                optionsBuilder.UseSqlite(@"Data Source =.\\Data\\SQlLiteDatabase.db");
+                optionsBuilder.UseSqlServer("Data Source=sql_server,1433;Initial Catalog=FiDaDatabase;User Id=sa;Password=A&VeryComplex123Password;Integrated Security=false;TrustServerCertificate=true;");
+                //optionsBuilder.UseSqlite(@"Data Source =.\\Data\\SQlLiteDatabase.db");
             }
         }
 
@@ -39,45 +39,45 @@ namespace FiDa.Database
                     DbContextOptions<FiDaDatabase>>());
 
             //check if db has been created
-            context.Database.EnsureDeleted();
+            //context.Database.EnsureDeleted();
             context.Database.EnsureCreated();
 
-            // Look for any FileUploads.
-            if (context.UploadedFiles.Any())
-            {
-                return;   // DB has been seeded
-            }
-            context.UploadedFiles.AddRange(
-                new FileUpload
-                {
-                    FileName = "My first file",
-                    Host = "pCloud",
-                    Size = 13.23,
-                    ModificationDate = DateTime.Now,
-                },
-                new FileUpload
-                {
-                    FileName = "My second file",
-                    Host = "pCloud",
-                    Size = 85.66,
-                    ModificationDate = DateTime.Now,
-                },
-                new FileUpload
-                {
-                    FileName = "My third file",
-                    Host = "pCloud",
-                    Size = 23.40,
-                    ModificationDate = DateTime.Now,
-                },
-                new FileUpload
-                {
-                    FileName = "My fourth file",
-                    Host = "pCloud",
-                    Size = 1.56,
-                    ModificationDate = DateTime.Now,
-                }
-            );
-            context.SaveChanges();
+            // // Look for any FileUploads.
+            // if (context.UploadedFiles.Any())
+            // {
+            //     return;   // DB has been seeded
+            // }
+            // context.UploadedFiles.AddRange(
+            //     new FileUpload
+            //     {
+            //         FileName = "My first file",
+            //         Host = "pCloud",
+            //         Size = 13.23,
+            //         ModificationDate = DateTime.Now,
+            //     },
+            //     new FileUpload
+            //     {
+            //         FileName = "My second file",
+            //         Host = "pCloud",
+            //         Size = 85.66,
+            //         ModificationDate = DateTime.Now,
+            //     },
+            //     new FileUpload
+            //     {
+            //         FileName = "My third file",
+            //         Host = "pCloud",
+            //         Size = 23.40,
+            //         ModificationDate = DateTime.Now,
+            //     },
+            //     new FileUpload
+            //     {
+            //         FileName = "My fourth file",
+            //         Host = "pCloud",
+            //         Size = 1.56,
+            //         ModificationDate = DateTime.Now,
+            //     }
+            // );
+            // context.SaveChanges();
         }
     }
 }

@@ -70,14 +70,35 @@ namespace FiDa.Controllers
 
         // Syncs all information from pCloud to App
         [HttpGet]
-        public ActionResult SyncRepo()
+        public async Task<ActionResult> SyncRepo()
         {
             ListFolderRequest req = new(0, true);
             var res = FolderController.ListFolder(req, _config["API_Tokens:PCloud"]).Result;
 
             if (res == null || (res.result != 0 && res.error != null)) throw new Exception("Could not Syncronize: " + res?.error);
 
-            Console.WriteLine("res " + JsonSerializer.Serialize(res));
+            var contents = res.metadata?.contents;
+            List<FileUpload> inserts = new();
+
+            if (contents != null)
+            {
+                foreach (var meta in contents)
+                {
+                    inserts.Add(new FileUpload
+                    {
+                        FileName = meta.name,
+                        Host = "pCloud",
+                        FileId = meta.isfolder ? (long)meta.folderid! : (long)meta.fileid!,
+                        ParentFolderId = meta.parentfolderid,
+                        Size = meta.size,
+                        ModificationDate = DateTime.Parse(meta.modified),
+                        CreatedDate = DateTime.Parse(meta.created)
+                    });
+                }
+
+                await Db.UploadedFiles.AddRangeAsync(inserts);
+                await Db.SaveChangesAsync();
+            }
 
             return RedirectToAction("Index");
         }
