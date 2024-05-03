@@ -8,7 +8,8 @@ builder.Services.AddControllersWithViews();
 
 // Database context
 builder.Services.AddDbContext<FiDaDatabase>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("FiDaDatabase")));
+    //options.UseSqlServer(builder.Configuration.GetConnectionString("FiDaDatabase")));
+    options.UseSqlite(builder.Configuration.GetConnectionString("VSDatabase")));
 
 
 var app = builder.Build();

@@ -3,7 +3,6 @@ using FiDa.Models;
 using Microsoft.AspNetCore.Mvc;
 using pcloud_sdk_csharp.Requests;
 using pcloud_sdk_csharp.Controllers;
-using System.Text.Json;
 
 namespace FiDa.Controllers
 {
@@ -20,9 +19,9 @@ namespace FiDa.Controllers
 
         // 
         // GET: /pcloud/ 
-        public ActionResult Index()
+        public ActionResult Index(long? folderId)
         {
-            List<FileUpload> files = Db.UploadedFiles.Where((f) => f.ParentFolderId == 0).ToList();
+            List<FileUpload>? files = Db.UploadedFiles.Where((f) => f.ParentFolderId == (folderId ?? 0)).ToList();
             return View(files ?? new List<FileUpload>());
         }
 
@@ -40,14 +39,16 @@ namespace FiDa.Controllers
                     {
                         UploadFileRequest req = new(folderId, file.FileName, file.OpenReadStream());
                         var res = FileController.UploadFile(req, _config["API_Tokens:PCloud"]).Result;
-                        Console.WriteLine("res size" + res.metadata?.First().size);
+
                         if (res == null || (res.result != 0 && res.error != null)) throw new Exception("PCloud returned an exception: " + res?.error);
+
+                        var fileMeta = res.metadata.First();
 
                         Db.UploadedFiles.Add(new FileUpload
                         {
                             FileName = file.FileName,
                             Host = "pCloud",
-                            Size = (res.metadata?.First().size ?? 0) / 1000,
+                            Size = !fileMeta.isfolder ? fileMeta.size / 1000 : null,
                             ParentFolderId = folderId,
                             ModificationDate = DateTime.Now
                         });
@@ -72,6 +73,10 @@ namespace FiDa.Controllers
         [HttpGet]
         public async Task<ActionResult> SyncRepo()
         {
+            // Clear current db entries for pcloud host
+            var currentEntries = Db.UploadedFiles.Where((f) => f.Host == "pCloud");
+            Db.UploadedFiles.RemoveRange(currentEntries);
+
             ListFolderRequest req = new(0, true);
             var res = FolderController.ListFolder(req, _config["API_Tokens:PCloud"]).Result;
 
@@ -90,9 +95,10 @@ namespace FiDa.Controllers
                         Host = "pCloud",
                         FileId = meta.isfolder ? (long)meta.folderid! : (long)meta.fileid!,
                         ParentFolderId = meta.parentfolderid,
-                        Size = meta.size,
+                        Size = meta.size / 1000000,
+                        IsFolder = meta.isfolder,
                         ModificationDate = DateTime.Parse(meta.modified),
-                        CreatedDate = DateTime.Parse(meta.created)
+                        CreationDate = DateTime.Parse(meta.created)
                     });
                 }
 

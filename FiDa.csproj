@@ -20,14 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Lib\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <None Include="wwwroot\Public\Avatar.png" />
-    <None Include="wwwroot\Public\DropBox.jpeg" />
-    <None Include="wwwroot\Public\OneDrive.jpg" />
-    <None Include="wwwroot\Public\pCloud.jpg" />
   </ItemGroup>
 
   <ItemGroup>

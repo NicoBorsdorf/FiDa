@@ -1,13 +1,16 @@
 {
   "dependencies": {
-    "secrets1": {
-      "type": "secrets.user"
-    },
     "sqlite1": {
       "secretStore": null,
       "type": "sqlite.local",
       "connectionId": "ConnectionStrings:VSDatabase",
       "dynamicId": null
+    },
+    "secrets1": {
+      "secretStore": null,
+      "resourceId": null,
+      "type": "secrets.user",
+      "connectionId": null
     }
   }
 }

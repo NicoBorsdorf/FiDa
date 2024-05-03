@@ -18,11 +18,14 @@ namespace FiDa.Models
 
         [Required(ErrorMessage = "Size is required")]
         [Range(0, double.MaxValue, ErrorMessage = "Size must be a positive number")]
-        public double Size { get; set; }
+        [DisplayFormat(DataFormatString = "{0:#.##}")]
+        public double? Size { get; set; }
 
         [Required(ErrorMessage = "A Parent Folder id is required.")]
         [Range(0, long.MaxValue)]
         public long ParentFolderId { get; set; }
+
+        public bool IsFolder { get; set; } = false;
 
         [Required(ErrorMessage = "A File Id is required.")]
         [Unique(ErrorMessage = "File Id must be uniqe")]
@@ -32,8 +35,10 @@ namespace FiDa.Models
         [DataType(DataType.DateTime, ErrorMessage = "Modification Date must be a valid date and time")]
         [DisplayFormat(DataFormatString = "{0:dd.MM.yyyy HH:mm}")]
         public DateTime ModificationDate { get; set; } = DateTime.Now;
+
+        [Required(ErrorMessage = "Creation Date is required")]
         [DisplayFormat(DataFormatString = "{0:dd.MM.yyyy HH:mm}")]
-        public DateTime CreatedDate { get; set; } = DateTime.Now;
+        public DateTime CreationDate { get; set; } = DateTime.Now;
     }
 
     public class User
