@@ -1,4 +1,4 @@
-@model IEnumerable<FiDa.Models.FileUpload>
+@model IEnumerable<FiDa.ViewModels.FileUpload>
 @{
 	ViewData["Title"] = "pCloud";
 }
@@ -88,7 +88,7 @@
 		</button>
 		@if (TempData != null && TempData["Errors"] != null)
 		{
-			var errors = (string[])TempData["Errors"];
+			var errors = (string[])TempData["Errors"]!;
 			foreach (var err in errors)
 			{
 				<p class="p-2 text-red-400 font-semibold">@err</p>

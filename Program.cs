@@ -1,5 +1,6 @@
 using FiDa.Database;
 using Microsoft.EntityFrameworkCore;
+using Auth0.AspNetCore.Authentication;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,6 +12,12 @@ builder.Services.AddDbContext<FiDaDatabase>(options =>
     //options.UseSqlServer(builder.Configuration.GetConnectionString("FiDaDatabase")));
     options.UseSqlite(builder.Configuration.GetConnectionString("VSDatabase")));
 
+// Auth0 
+builder.Services.AddAuth0WebAppAuthentication(options =>
+{
+    options.Domain = builder.Configuration["Auth0:Domain"];
+    options.ClientId = builder.Configuration["Auth0:ClientId"];
+});
 
 var app = builder.Build();
 

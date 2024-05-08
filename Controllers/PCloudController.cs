@@ -1,8 +1,10 @@
 using FiDa.Database;
-using FiDa.Models;
+using FiDa.DatabaseModels;
 using Microsoft.AspNetCore.Mvc;
 using pcloud_sdk_csharp.Requests;
 using pcloud_sdk_csharp.Controllers;
+using Microsoft.AspNetCore.Authorization;
+using FiDa.ViewModels;
 
 namespace FiDa.Controllers
 {
@@ -20,13 +22,15 @@ namespace FiDa.Controllers
 
         // 
         // GET: /pcloud/ 
+        [Authorize]
         public ActionResult Index(long? folderId)
         {
-            List<FileUpload>? files = Db.UploadedFiles.Where((f) => f.ParentFolderId == (folderId ?? 0)).OrderByDescending((f) => f.IsFolder).ToList();
-            return View(files ?? new List<FileUpload>());
+            var files = Db.UploadedFiles.Where((f) => f.ParentFolderId == (folderId ?? 0)).OrderByDescending((f) => f.IsFolder).Cast<FileViewModel>().ToList();//((file) => new FileViewModel { Id = file.Id, FileId = file.FileId, FileName = file.FileName, CreationDate = file.CreationDate, Hostname = file.Hostname, IsFolder = file.IsFolder, ModificationDate = file.ModificationDate, ParentFolderId = file.ParentFolderId, Size = file.Size });
+            return View(files ?? new List<FileViewModel>());
         }
 
         //[HttpPost]
+        [Authorize]
         public ActionResult UploadFile(IFormCollection? form)
         {
             if (form != null && form.Count > 0)
@@ -47,7 +51,7 @@ namespace FiDa.Controllers
 
                         var fileMeta = res.metadata.First();
 
-                        Db.UploadedFiles.Add(new FileUpload
+                        Db.UploadedFiles.Add(new UploadedFile
                         {
                             FileName = file.FileName,
                             Hostname = _host,
@@ -72,6 +76,7 @@ namespace FiDa.Controllers
         }
 
         // Syncs all information from pCloud to App
+        [Authorize]
         public async Task<ActionResult> SyncRepo()
         {
             // Clear current db entries for pcloud host
@@ -87,10 +92,10 @@ namespace FiDa.Controllers
 
             if (contents != null)
             {
-                List<FileUpload> inserts = new();
+                List<UploadedFile> inserts = new();
                 foreach (var meta in contents)
                 {
-                    inserts.Add(new FileUpload
+                    inserts.Add(new UploadedFile
                     {
                         FileName = meta.name,
                         Hostname = Hosts.pCloud,
