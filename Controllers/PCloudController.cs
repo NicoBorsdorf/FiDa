@@ -10,7 +10,8 @@ namespace FiDa.Controllers
     {
         private readonly FiDaDatabase Db = new();
         private readonly IConfiguration _config;
-        //private readonly string _token = Db.User.
+        //private readonly User currentUser = Db.User.Find((u) => u.);
+        private readonly Hosts _host = Hosts.pCloud;
 
         public PCloudController(IConfiguration configuration)
         {
@@ -21,7 +22,7 @@ namespace FiDa.Controllers
         // GET: /pcloud/ 
         public ActionResult Index(long? folderId)
         {
-            List<FileUpload>? files = Db.UploadedFiles.Where((f) => f.ParentFolderId == (folderId ?? 0)).ToList();
+            List<FileUpload>? files = Db.UploadedFiles.Where((f) => f.ParentFolderId == (folderId ?? 0)).OrderByDescending((f) => f.IsFolder).ToList();
             return View(files ?? new List<FileUpload>());
         }
 
@@ -32,6 +33,8 @@ namespace FiDa.Controllers
             {
                 long folderId = long.Parse(form["Folder"]);
                 IFormFile[] files = form.Files.ToArray();
+
+                List<string> errors = new();
 
                 foreach (var file in files)
                 {
@@ -47,34 +50,32 @@ namespace FiDa.Controllers
                         Db.UploadedFiles.Add(new FileUpload
                         {
                             FileName = file.FileName,
-                            Host = "pCloud",
+                            Hostname = _host,
+                            FileId = res.fileids.First(),
                             Size = !fileMeta.isfolder ? fileMeta.size / 1000 : null,
                             ParentFolderId = folderId,
                             ModificationDate = DateTime.Now
                         });
-
-                        ViewBag.Message = "File Uploaded Successfully!!";
                     }
                     catch (Exception e)
                     {
                         Console.Error.WriteLine(e.Message);
-                        ViewBag.Message += $"File upload failed for file: {file.FileName} <br />";
+                        errors.Add($"File upload failed for file: {file.FileName}");
                     }
-
-                    Db.SaveChanges();
-
                 }
-                return RedirectToAction("Index");
+                Db.SaveChanges();
+
+                TempData["Errors"] = errors;
+
             }
-            return PartialView("_UploadFile");
+            return RedirectToAction("Index");
         }
 
         // Syncs all information from pCloud to App
-        [HttpGet]
         public async Task<ActionResult> SyncRepo()
         {
             // Clear current db entries for pcloud host
-            var currentEntries = Db.UploadedFiles.Where((f) => f.Host == "pCloud");
+            var currentEntries = Db.UploadedFiles.Where((f) => f.Hostname == _host);
             Db.UploadedFiles.RemoveRange(currentEntries);
 
             ListFolderRequest req = new(0, true);
@@ -82,20 +83,20 @@ namespace FiDa.Controllers
 
             if (res == null || (res.result != 0 && res.error != null)) throw new Exception("Could not Syncronize: " + res?.error);
 
-            var contents = res.metadata?.contents;
-            List<FileUpload> inserts = new();
+            var contents = res.metadata.contents;
 
             if (contents != null)
             {
+                List<FileUpload> inserts = new();
                 foreach (var meta in contents)
                 {
                     inserts.Add(new FileUpload
                     {
                         FileName = meta.name,
-                        Host = "pCloud",
+                        Hostname = Hosts.pCloud,
                         FileId = meta.isfolder ? (long)meta.folderid! : (long)meta.fileid!,
                         ParentFolderId = meta.parentfolderid,
-                        Size = meta.size / 1000000,
+                        Size = meta.size / 1000,
                         IsFolder = meta.isfolder,
                         ModificationDate = DateTime.Parse(meta.modified),
                         CreationDate = DateTime.Parse(meta.created)

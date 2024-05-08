@@ -37,17 +37,19 @@ namespace FiDa.Database
             using var context = new FiDaDatabase(
                 serviceProvider.GetRequiredService<
                     DbContextOptions<FiDaDatabase>>());
-
+            context.Database.EnsureCreated();
+            context.Database.MigrateAsync().Wait();
+            return;
 
             // Look for any FileUploads.
-            if (context.UploadedFiles.Any())
-            {
-                return;   // DB has been seeded
-            }
+            //if (context.UploadedFiles.Any())
+            //{
+            //    return;   // DB has been seeded
+            //}
 
             //check if db has been created
-            context.Database.EnsureDeleted();
-            context.Database.EnsureCreated();
+            //context.Database.EnsureDeleted();
+            //context.Database.EnsureCreated();
             //context.UploadedFiles.AddRange(
             //    new FileUpload
             //    {

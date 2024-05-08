@@ -1,20 +1,21 @@
+using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
-using FiDa.Database;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace FiDa.Models
 {
+    [Index(nameof(Id), IsUnique = true)]
     public class FileUpload
     {
-        [Key]
-        public int Id { get; set; }
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public string Id { get; }
 
         [Required(ErrorMessage = "FileName is required")]
         [StringLength(255, MinimumLength = 1, ErrorMessage = "FileName must be between 1 and 255 characters")]
         public string FileName { get; set; }
 
         [Required(ErrorMessage = "Host is required")]
-        [StringLength(255, MinimumLength = 1, ErrorMessage = "Host must be between 1 and 255 characters")]
-        public string Host { get; set; }
+        public Hosts Hostname { get; set; }
 
         [Required(ErrorMessage = "Size is required")]
         [Range(0, double.MaxValue, ErrorMessage = "Size must be a positive number")]
@@ -28,7 +29,6 @@ namespace FiDa.Models
         public bool IsFolder { get; set; } = false;
 
         [Required(ErrorMessage = "A File Id is required.")]
-        [Unique(ErrorMessage = "File Id must be uniqe")]
         public long FileId { get; set; }
 
         [Required(ErrorMessage = "Modification Date is required")]
@@ -41,31 +41,50 @@ namespace FiDa.Models
         public DateTime CreationDate { get; set; } = DateTime.Now;
     }
 
+    [Index(nameof(Id), nameof(Username), IsUnique = true)]
     public class User
     {
-        [Key]
-        public int Id { get; set; }
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public string Id { get; }
 
         [Required(ErrorMessage = "Username is required.")]
         public string Username { get; set; }
 
+        public virtual List<UserHost> ConfiguredHosts { get; set; } = new List<UserHost>();
+
         [Required(ErrorMessage = "Modification Date is required")]
         [DataType(DataType.DateTime, ErrorMessage = "Modification Date must be a valid date and time")]
-        public DateTime ModificationDate { get; set; } = new DateTime();
+        [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
+        public DateTime ModificationDate { get; } = new DateTime();
         public DateTime CreatedDate { get; } = new DateTime();
     }
 
-
-    // Unique validation
-    public class Unique : ValidationAttribute
+    [Index(nameof(Id), IsUnique = true)]
+    public class UserHost
     {
-        protected override ValidationResult IsValid(object value, ValidationContext validationContext)
-        {
-            long fileId = long.Parse(value.ToString());
-            using (FiDaDatabase db = new())
-            {
-                return db.UploadedFiles.FirstOrDefault((f) => f.FileId == fileId) == null ? ValidationResult.Success : new ValidationResult(ErrorMessageString);
-            }
-        }
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public string Id { get; }
+
+        [Required(ErrorMessage = "A Host Name is required.")]
+        public Hosts Hostname { get; set; }
+
+        [Required(ErrorMessage = "A Api key must be provided.")]
+        public string ApiKey { get; set; }
+
+        public virtual User User { get; set; }
+
+        [Required(ErrorMessage = "Modification Date is required")]
+        [DataType(DataType.DateTime, ErrorMessage = "Modification Date must be a valid date and time")]
+        [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
+        public DateTime ModificationDate { get; } = new DateTime();
+        public DateTime CreatedDate { get; } = new DateTime();
+    }
+
+    public enum Hosts
+    {
+        pCloud,
+        Dropbox,
+        GoogleDrive,
+        OneDrive
     }
 }
