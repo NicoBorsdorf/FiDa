@@ -1,9 +1,9 @@
 {
   "dependencies": {
-    "sqlite1": {
-      "secretStore": null,
-      "type": "sqlite.local",
-      "connectionId": "ConnectionStrings:VSDatabase",
+    "mssql1": {
+      "secretStore": "LocalSecretsFile",
+      "type": "mssql.local",
+      "connectionId": "ConnectionStrings:FiDaDatabase",
       "dynamicId": null
     },
     "secrets1": {
