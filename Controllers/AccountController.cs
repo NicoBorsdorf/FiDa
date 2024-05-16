@@ -13,7 +13,7 @@ namespace FiDa.Controllers
         public async Task Login()
         {
             var authenticationProperties = new LoginAuthenticationPropertiesBuilder()
-                .WithRedirectUri(Url.Action("Index", "Dashboard"))
+                .WithRedirectUri(Url.Action("Index", "Dashboard")!)
                 .Build();
 
             await HttpContext.ChallengeAsync(Auth0Constants.AuthenticationScheme, authenticationProperties);
@@ -25,7 +25,7 @@ namespace FiDa.Controllers
             var authenticationProperties = new LogoutAuthenticationPropertiesBuilder()
                 // Indicate here where Auth0 should redirect the user after a logout.
                 // Note that the resulting absolute Uri must be whitelisted in 
-                .WithRedirectUri(Url.Action("Login", "Account"))
+                .WithRedirectUri(Url.Action("Index", "Dashboard")!)
                 .Build();
 
             await HttpContext.SignOutAsync(Auth0Constants.AuthenticationScheme, authenticationProperties);
