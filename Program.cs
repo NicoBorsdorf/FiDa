@@ -3,30 +3,27 @@ using Microsoft.EntityFrameworkCore;
 using Auth0.AspNetCore.Authentication;
 
 var builder = WebApplication.CreateBuilder(args);
+var config = builder.Configuration;
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
 // Database context
-builder.Services.AddDbContext<FiDaDatabase>(options =>
-    //options.UseSqlServer(builder.Configuration.GetConnectionString("FiDaDatabase")));
-    options.UseSqlite(builder.Configuration.GetConnectionString("VSDatabase")));
+builder.Services.AddDbContext<FiDaDatabase>(options => options.UseSqlServer(config.GetConnectionString("FiDaDatabase")));
 
 // Auth0 
 builder.Services.AddAuth0WebAppAuthentication(options =>
 {
-    options.Domain = builder.Configuration["Auth0:Domain"];
-    options.ClientId = builder.Configuration["Auth0:ClientId"];
+    options.Domain = config["Auth0:Domain"];
+    options.ClientId = config["Auth0:ClientId"];
 });
 
 var app = builder.Build();
 
-// seed db if empty
 using (var scope = app.Services.CreateScope())
 {
-    var services = scope.ServiceProvider;
-
-    SeedData.Initialize(services);
+    var dbContext = scope.ServiceProvider.GetRequiredService<FiDaDatabase>();
+    dbContext.Database.MigrateAsync().Wait();
 }
 
 // Configure the HTTP request pipeline.
@@ -42,6 +39,7 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllerRoute(
