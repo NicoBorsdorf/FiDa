@@ -16,7 +16,7 @@ namespace FiDa.DatabaseModels
         public string FileName { get; set; } = null!;
 
         [Required(ErrorMessage = "Host is required")]
-        public Hosts Host { get; set; }
+        public UserHost Host { get; set; } = null!;
 
         [Range(0, double.MaxValue, ErrorMessage = "Size must be a positive number")]
         [DisplayFormat(DataFormatString = "{0:#.##}")]
@@ -78,6 +78,7 @@ namespace FiDa.DatabaseModels
 
         [Required(ErrorMessage = "A Host Name is required.")]
         public Hosts Host { get; set; }
+        public ICollection<UploadedFile> Files { get; private set; } = new List<UploadedFile>();
 
         [Required(ErrorMessage = "A Api key must be provided.")]
         public string ApiKey { get; set; } = null!;

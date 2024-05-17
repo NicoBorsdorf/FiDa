@@ -35,12 +35,12 @@
 						<div class="flex justify-between">
 							@userHost.Host.ToString()
 							<div class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-[#2563eb] text-[#f8fafc] hover:bg-[#2563eb]/80">
-								123
+								@userHost.Files.Count
 							</div>
 						</div>
 					</a>
 				}
-				<button key="newHost" class="bg-blue-600 text-xl font-semibold hover:bg-blue-400 p-2 hover:cursor-pointer rounded-md active:ring-2 active:bg-blue-800 focus-within:bg-blue-800 focus-within:ring-2 ring-slate-200">
+				<button key="newHost" onclick="toggleDropdown()" class="bg-blue-600 text-xl font-semibold hover:bg-blue-400 p-2 hover:cursor-pointer rounded-md active:ring-2 active:bg-blue-800 focus-within:bg-blue-800 focus-within:ring-2 ring-slate-200">
 					<div class="flex justify-between items-center">
 						<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 24 24" overflow="visible" xml:space="preserve" class="size-6">
 						<g id="Icon" fill="currentColor">
@@ -50,6 +50,26 @@
 						Configure a new Host
 					</div>
 				</button>
+
+				<!-- Dropdown menu -->
+				<div id="dropdown" class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700">
+					<ul class="py-2 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownDefaultButton">
+						<li>
+							<a href="#" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">PCloud</a>
+						</li>
+						<li>
+							<a href="#" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Dropbox</a>
+						</li>
+						<li>
+							<a href="#" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">OneDrive</a>
+						</li>
+						<li>
+							<a href="#" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Google Drive</a>
+						</li>
+					</ul>
+				</div>
+
+
 			</div>
 		</nav>
 		<main role="main" class="min-h-full p-4 w-full">
@@ -62,6 +82,14 @@
 			&copy; All rights reserved.
 		</div>
 	</footer>
+
+	<script type="text/javascript">
+		function toggleDropdown() {
+			console.log("asdfghjkl")
+			const e = document.getElementById("dropdown");
+			e.classList.contains("hidden") ? e.classList.remove("hidden") : e.classList.add("hidden");
+		}
+	</script>
 
 </body>
 

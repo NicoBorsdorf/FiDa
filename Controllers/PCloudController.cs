@@ -30,11 +30,12 @@ namespace FiDa.Controllers
         [Authorize]
         public ActionResult Index(long? folderId)
         {
-            var _files = _db.UploadedFiles.Where((f) => f.Account == _currentUser && f.Host == Hosts.PCloud);
-            FileViewModel model = new();
-
-            model.RootFiles = _files.Where((f) => f.ParentFolderId == (folderId ?? 0)).OrderByDescending((f) => f.IsFolder).ToList();
-            model.Folders = _files.Where((f) => f.IsFolder).ToList();
+            var _files = _db.UploadedFiles.Where((f) => f.Account == _currentUser && f.Host == _host);
+            FileViewModel model = new()
+            {
+                RootFiles = _files.Where((f) => f.ParentFolderId == (folderId ?? 0)).OrderByDescending((f) => f.IsFolder).ToList(),
+                Folders = _files.Where((f) => f.IsFolder).ToList()
+            };
 
             return View(model);
         }
@@ -64,7 +65,7 @@ namespace FiDa.Controllers
                         _db.UploadedFiles.Add(new UploadedFile
                         {
                             FileName = file.FileName,
-                            Host = _host.Host,
+                            Host = _host,
                             FileId = res.fileids.First(),
                             Size = !fileMeta.isfolder ? fileMeta.size / 1000 : null,
                             ParentFolderId = folderId,
@@ -92,7 +93,7 @@ namespace FiDa.Controllers
         public async Task<ActionResult> SyncRepo()
         {
             // Clear current db entries for pcloud host
-            var currentEntries = _db.UploadedFiles.Where((f) => f.Host == _host.Host && f.Account == _currentUser);
+            var currentEntries = _db.UploadedFiles.Where((f) => f.Host == _host && f.Account == _currentUser);
             _db.UploadedFiles.RemoveRange(currentEntries);
 
             ListFolderRequest req = new(0, true);
@@ -110,7 +111,7 @@ namespace FiDa.Controllers
                     inserts.Add(new UploadedFile
                     {
                         FileName = meta.name,
-                        Host = _host.Host,
+                        Host = _host,
                         FileId = meta.isfolder ? (long)meta.folderid! : (long)meta.fileid!,
                         ParentFolderId = meta.parentfolderid,
                         Size = meta.size / 1000,
