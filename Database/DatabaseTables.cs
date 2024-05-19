@@ -19,7 +19,7 @@ namespace FiDa.DatabaseModels
         public UserHost Host { get; set; } = null!;
 
         [Range(0, double.MaxValue, ErrorMessage = "Size must be a positive number")]
-        [DisplayFormat(DataFormatString = "{0:#.##}")]
+        [Precision(18, 2)]
         public decimal? Size { get; set; }
 
         [Required(ErrorMessage = "A Parent Folder id is required.")]
