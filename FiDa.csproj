@@ -7,6 +7,8 @@
 		<UserSecretsId>e56adbf4-c6f2-4ac0-aca0-f6e8c12f5d15</UserSecretsId>
 	</PropertyGroup>
 
+	<PropertyGroup Condition=" '$(RunConfiguration)' == 'https' " />
+	<PropertyGroup Condition=" '$(RunConfiguration)' == 'http' " />
 	<ItemGroup>
 		<PackageReference Include="Auth0.AspNetCore.Authentication" Version="1.4.1" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.19" />
