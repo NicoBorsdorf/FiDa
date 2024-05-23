@@ -5,29 +5,27 @@ using pcloud_sdk_csharp.Controllers;
 using Microsoft.AspNetCore.Authorization;
 using FiDa.DatabaseModels;
 using FiDa.ViewModels;
+using FiDa.Lib;
 
 namespace FiDa.Controllers
 {
     public class PCloudController : Controller
     {
         private readonly FiDaDatabase _db = new();
-        private readonly Account _currentUser;
+        private Account _currentUser;
         private readonly UserHost _host;
 
-        public PCloudController()
+        public PCloudController(IHttpContextAccessor contextAccessor)
         {
-            if (User.Identity?.Name == null) throw new Exception("No User provided.");
-            _currentUser = _db.Account.First((a) => a.Username == User.Identity.Name);
+            _currentUser = Utils.GetAccount(contextAccessor.HttpContext?.User.Identity?.Name);
 
-            if (_currentUser == null) throw new Exception("No User found in Database");
-
-            _host = _currentUser.ConfiguredHosts.First((h) => h.Host == Hosts.PCloud);
-            if (_host == null || _host?.ApiKey == null) throw new Exception("No or faulty host configuration found for pCloud");
+            _host = _currentUser.ConfiguredHosts.FirstOrDefault((h) => h.Host == Hosts.PCloud)!;
+            if (null == _host) throw new Exception("No PCloud host configured for user");
         }
 
-        // 
-        // GET: /pcloud/ 
+
         [Authorize]
+        [HttpGet]
         public ActionResult Index(long? folderId)
         {
             var _files = _db.UploadedFiles.Where((f) => f.Account == _currentUser && f.Host == _host);
@@ -40,8 +38,9 @@ namespace FiDa.Controllers
             return View(model);
         }
 
-        //[HttpPost]
+
         [Authorize]
+        [HttpPost]
         public ActionResult UploadFile(IFormCollection? form)
         {
             if (form != null && form.Count > 0)
@@ -89,6 +88,7 @@ namespace FiDa.Controllers
         }
 
         // Syncs all information from pCloud to App
+        [HttpGet]
         [Authorize]
         public async Task<ActionResult> SyncRepo()
         {

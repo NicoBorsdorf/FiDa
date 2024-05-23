@@ -11,18 +11,16 @@ namespace FiDa.Controllers;
 public class DashboardController : Controller
 {
     private readonly FiDaDatabase _db = new();
+    private Account _currentUser;
+
+    public DashboardController(IHttpContextAccessor contextAccessor)
+    {
+        _currentUser = Utils.GetAccount(contextAccessor.HttpContext?.User.Identity?.Name);
+    }
 
     [Authorize]
     public IActionResult Index()
     {
-        string? uName = User.Identity?.Name;
-        if (uName == null) throw new Exception("No Username for given user.");
-
-        var _currentUser = _db.Account.FirstOrDefault((a) => a.Username == uName);
-
-        if (_currentUser == null) _currentUser = Utils.AddAccount(new Account(uName)).Result;
-        if (_currentUser == null) throw new Exception("Account creation failed.");
-
         return View(_currentUser);
     }
 
