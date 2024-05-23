@@ -18,6 +18,8 @@ builder.Services.AddAuth0WebAppAuthentication(options =>
     options.ClientId = config["Auth0:ClientId"];
 });
 
+builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+
 var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
