@@ -20,5 +20,13 @@ namespace FiDa.Lib
                 return null;
             }
         }
+
+        public static Account GetAccount(string? uName)
+        {
+            if (string.IsNullOrEmpty(uName)) throw new ArgumentNullException("No Username Provided");
+            var a = _db.Account.FirstOrDefault((a) => a.Username == uName);
+            if (a == null) throw new ArgumentException("No Account found on Database");
+            return a;
+        }
     }
 }
