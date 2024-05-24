@@ -7,7 +7,6 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 	<title>@ViewData["Title"] - FiDa</title>
 	<script src="https://cdn.tailwindcss.com"></script>
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 </head>
 
 <body class="bg-slate-900 text-slate-200 dark">
@@ -30,7 +29,7 @@
 			<div class="grid grid-cols-1 gap-2">
 				@foreach (var userHost in Model.ConfiguredHosts)
 				{
-					<a key="@userHost.Host" href="@userHost.Host.ToString()"
+					<a key="@userHost.Host" href="@userHost.Host.ToString().ToLower()"
 				   class=" text-xl font-semibold hover:bg-slate-600 p-2 hover:cursor-pointer rounded-md active:ring-2 active:bg-slate-600 focus-within:bg-slate-600 focus-within:ring-2 ring-slate-200">
 						<div class="flex justify-between">
 							@userHost.Host.ToString()
@@ -82,7 +81,6 @@
 
 	<script type="text/javascript">
 		function toggleDropdown() {
-			console.log("asdfghjkl")
 			const e = document.getElementById("dropdown");
 			e.classList.contains("hidden") ? e.classList.remove("hidden") : e.classList.add("hidden");
 		}
