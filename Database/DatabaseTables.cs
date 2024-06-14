@@ -23,13 +23,12 @@ namespace FiDa.DatabaseModels
         public decimal? Size { get; set; }
 
         [Required(ErrorMessage = "A Parent Folder id is required.")]
-        [Range(0, long.MaxValue)]
-        public long ParentFolderId { get; set; }
+        public string ParentFolderId { get; set; } = null!;
 
         public bool IsFolder { get; set; } = false;
 
         [Required(ErrorMessage = "A File Id is required.")]
-        public long FileId { get; set; }
+        public string FileId { get; set; } = null!;
 
         [Required(ErrorMessage = "File can not be created without an set Account")]
         public Account Account { get; set; } = null!;
@@ -86,7 +85,7 @@ namespace FiDa.DatabaseModels
         [Required(ErrorMessage = "Account is required")]
         public int AccountId { get; set; }
         [Required(ErrorMessage = "Account is required")]
-        public Account Account { get; set; } = null!;
+        public virtual Account Account { get; set; } = null!;
 
         [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
         public DateTime Modified { get; }
