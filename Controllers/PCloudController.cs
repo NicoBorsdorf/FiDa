@@ -1,11 +1,12 @@
 using FiDa.Database;
 using Microsoft.AspNetCore.Mvc;
-using pcloud_sdk_csharp.Requests;
-using pcloud_sdk_csharp.Controllers;
 using Microsoft.AspNetCore.Authorization;
 using FiDa.DatabaseModels;
 using FiDa.ViewModels;
 using FiDa.Lib;
+using pcloud_sdk_csharp.File.Requests;
+using pcloud_sdk_csharp.Client;
+using pcloud_sdk_csharp.Folder.Requests;
 
 namespace FiDa.Controllers
 {
@@ -14,6 +15,7 @@ namespace FiDa.Controllers
         private readonly FiDaDatabase _db = new();
         private Account _currentUser;
         private readonly UserHost _host;
+        private readonly PCloudClient _pClient;
 
         public PCloudController(IHttpContextAccessor contextAccessor)
         {
@@ -21,6 +23,9 @@ namespace FiDa.Controllers
 
             _host = _currentUser.ConfiguredHosts.FirstOrDefault((h) => h.Host == Hosts.PCloud)!;
             if (null == _host) throw new Exception("No PCloud host configured for user");
+
+            // throw if token is null is already implemented in SDK
+            _pClient = new PCloudClient(_host.ApiKey);
         }
 
 
@@ -31,13 +36,12 @@ namespace FiDa.Controllers
             var _files = _db.UploadedFiles.Where((f) => f.Account == _currentUser && f.Host == _host);
             FileViewModel model = new()
             {
-                RootFiles = _files.Where((f) => f.ParentFolderId == (folderId ?? 0)).OrderByDescending((f) => f.IsFolder).ToList(),
+                RootFiles = _files.Where((f) => f.ParentFolderId == (folderId ?? 0).ToString()).OrderByDescending((f) => f.IsFolder).ToList(),
                 Folders = _files.Where((f) => f.IsFolder).ToList()
             };
 
             return View(model);
         }
-
 
         [Authorize]
         [HttpPost]
@@ -55,22 +59,22 @@ namespace FiDa.Controllers
                     try
                     {
                         UploadFileRequest req = new(folderId, file.FileName, file.OpenReadStream());
-                        var res = FileController.UploadFile(req, _currentUser.ConfiguredHosts.First((h) => h.Host == Hosts.PCloud).ApiKey).Result;
+                        var res = _pClient.Files.UploadFile(req).Result;
 
-                        if (res == null || (res.result != 0 && res.error != null)) throw new Exception("PCloud returned an exception: " + res?.error);
+                        if (null == res || (res.result != 0 && res.error != null)) throw new Exception("PCloud returned an exception: " + res?.error);
 
-                        var fileMeta = res.metadata.First();
+                        var fileMeta = res.metadata!.First();
 
                         _db.UploadedFiles.Add(new UploadedFile
                         {
                             FileName = file.FileName,
                             Host = _host,
-                            FileId = res.fileids.First(),
+                            FileId = res.fileids!.First().ToString(),
                             Size = !fileMeta.isfolder ? fileMeta.size / 1000 : null,
-                            ParentFolderId = folderId,
+                            ParentFolderId = folderId.ToString(),
                             IsFolder = false,
-                            Modified = DateTime.Parse(fileMeta.modified),
-                            Created = DateTime.Parse(fileMeta.created)
+                            Modified = fileMeta.modified,
+                            Created = fileMeta.created
                         });
                     }
                     catch (Exception e)
@@ -97,11 +101,11 @@ namespace FiDa.Controllers
             _db.UploadedFiles.RemoveRange(currentEntries);
 
             ListFolderRequest req = new(0, true);
-            var res = FolderController.ListFolder(req, _host.ApiKey).Result;
+            var res = _pClient.Folders.ListFolder(req).Result;
 
             if (res == null || (res.result != 0 && res.error != null)) throw new Exception("Could not Syncronize: " + res?.error);
 
-            var contents = res.metadata.contents;
+            var contents = res.metadata!.contents;
 
             if (contents != null)
             {
@@ -112,12 +116,12 @@ namespace FiDa.Controllers
                     {
                         FileName = meta.name,
                         Host = _host,
-                        FileId = meta.isfolder ? (long)meta.folderid! : (long)meta.fileid!,
-                        ParentFolderId = meta.parentfolderid,
+                        FileId = meta.isfolder ? meta.folderid.ToString()! : meta.fileid.ToString()!,
+                        ParentFolderId = meta.parentfolderid.ToString(),
                         Size = meta.size / 1000,
                         IsFolder = meta.isfolder,
-                        Modified = DateTime.Parse(meta.modified),
-                        Created = DateTime.Parse(meta.created)
+                        Modified = meta.modified,
+                        Created = meta.created
                     });
                 }
 
