@@ -11,12 +11,12 @@ namespace FiDa.Controllers
     {
         private readonly Account _currentUser;
         private readonly UserHost _userHost;
-        private readonly FiDaDatabase _db = new();
+        private readonly FiDaDatabase _db = new(options: new());
         private readonly DropboxClient _dropboxClient;
 
         public DropboxController(IHttpContextAccessor httpContextAccessor)
         {
-            _currentUser = Utils.GetAccount(httpContextAccessor.HttpContext?.User.Identity?.Name);
+            _currentUser = Utils.GetAccount(httpContextAccessor.HttpContext?.User.Identity?.Name!);
             _userHost = _currentUser.ConfiguredHosts.FirstOrDefault((h) => h.Host == Hosts.Dropbox)!;
 
             if (null == _userHost) throw new Exception("No Host configured for Dropbox");
@@ -37,15 +37,15 @@ namespace FiDa.Controllers
 
             var uploadedFiles = dropBoxContent.Entries.Select((e) => new UploadedFile
             {
+                FileName = e.Name,
                 Account = _currentUser,
                 Created = (DateTime)e.AsFile.FileLockInfo.Created!,
                 FileId = !e.IsFolder ? e.AsFile.Id : e.AsFolder.Id,
-                FileName = e.Name,
                 Host = _userHost,
                 IsFolder = e.IsFolder,
                 Modified = e.AsFile.ServerModified,
                 ParentFolderId = e.ParentSharedFolderId,
-                Size = e.AsFile.Size,
+                Size = e.AsFile.Size
             });
 
             await _db.UploadedFiles.AddRangeAsync(uploadedFiles);

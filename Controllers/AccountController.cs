@@ -2,9 +2,7 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
 using Auth0.AspNetCore.Authentication;
-using FiDa.ViewModels;
 
 namespace FiDa.Controllers
 {
@@ -31,18 +29,6 @@ namespace FiDa.Controllers
             await HttpContext.SignOutAsync(Auth0Constants.AuthenticationScheme, authenticationProperties);
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
         }
-
-        [Authorize]
-        public IActionResult Profile()
-        {
-            return View(new UserViewModel()
-            {
-                UserName = User.Identity.Name,
-                Email = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value,
-                ProfilePicture = User.Claims.FirstOrDefault(c => c.Type == "picture")?.Value
-            });
-        }
-
 
         /// <summary>
         /// This is just a helper action to enable you to easily see all claims related to a user. It helps when debugging your

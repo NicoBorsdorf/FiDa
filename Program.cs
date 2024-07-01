@@ -20,12 +20,39 @@ builder.Services.AddAuth0WebAppAuthentication(options =>
 
 builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole();
+
 var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
 {
-    var dbContext = scope.ServiceProvider.GetRequiredService<FiDaDatabase>();
-    dbContext.Database.MigrateAsync().Wait();
+    var services = scope.ServiceProvider;
+    {
+        var logger = services.GetRequiredService<ILogger<Program>>();
+        var dbContext = services.GetRequiredService<FiDaDatabase>();
+
+        //dbContext.Database.EnsureDeleted();
+        //dbContext.Database.EnsureCreated();
+
+        var pendingMigrations = dbContext.Database.GetPendingMigrations();
+        if (pendingMigrations.Any())
+        {
+            try
+            {
+                logger.LogDebug("Applying pending migrations: {migrations}", string.Join(", ", pendingMigrations));
+                dbContext.Database.Migrate();
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "An error occurred while migrating or seeding the database.");
+            }
+        }
+        else
+        {
+            logger.LogDebug("No pending migrations.");
+        }
+    }
 }
 
 // Configure the HTTP request pipeline.
