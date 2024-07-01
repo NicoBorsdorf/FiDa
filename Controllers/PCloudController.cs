@@ -12,34 +12,53 @@ namespace FiDa.Controllers
 {
     public class PCloudController : Controller
     {
-        private readonly FiDaDatabase _db = new();
-        private Account _currentUser;
+        private readonly FiDaDatabase _db = new(options: new());
+        private readonly Account _currentUser;
         private readonly UserHost _host;
         private readonly PCloudClient _pClient;
+        private readonly ILogger _logger;
 
-        public PCloudController(IHttpContextAccessor contextAccessor)
+        public PCloudController(IHttpContextAccessor contextAccessor, ILogger<PCloudController> logger)
         {
-            _currentUser = Utils.GetAccount(contextAccessor.HttpContext?.User.Identity?.Name);
+            _logger = logger;
+            _logger.LogInformation("New Instance PCloudController");
+
+            ViewData["Title"] = "PCloud";
+
+            _currentUser = Utils.GetAccount(contextAccessor.HttpContext?.User.Identity?.Name!);
 
             _host = _currentUser.ConfiguredHosts.FirstOrDefault((h) => h.Host == Hosts.PCloud)!;
-            if (null == _host) throw new Exception("No PCloud host configured for user");
+            if (null == _host)
+            {
+                _logger.LogError("PCloudController - could not find host configuration for user: {user}", _currentUser.Username);
+                throw new Exception("No PCloud host configured for user");
+            }
 
             // throw if token is null is already implemented in SDK
-            _pClient = new PCloudClient(_host.ApiKey);
+            _pClient = new PCloudClient(_host.ApiKey, _host.HostAddress);
+            _logger.LogInformation("PCloudController - create pcloud api client");
         }
 
 
         [Authorize]
-        [HttpGet]
-        public ActionResult Index(long? folderId)
+        [HttpGet("{id}")]
+        public ActionResult Index(long? id)
         {
+            _logger.LogInformation("PCloudController Index - folderId: {folderId}", id);
+
+            ViewBag.Account = _currentUser;
+
             var _files = _db.UploadedFiles.Where((f) => f.Account == _currentUser && f.Host == _host);
-            FileViewModel model = new()
+            var fileViewModel = new FileViewModel
             {
-                RootFiles = _files.Where((f) => f.ParentFolderId == (folderId ?? 0).ToString()).OrderByDescending((f) => f.IsFolder).ToList(),
+                RootFiles = _files.Where((f) => f.ParentFolderId == (id ?? 0).ToString()).OrderByDescending((f) => f.IsFolder).ToList(),
                 Folders = _files.Where((f) => f.IsFolder).ToList()
             };
-
+            var model = new BaseViewModel
+            {
+                Account = _currentUser,
+                FileViewModel = fileViewModel
+            };
             return View(model);
         }
 
@@ -47,6 +66,8 @@ namespace FiDa.Controllers
         [HttpPost]
         public ActionResult UploadFile(IFormCollection? form)
         {
+            _logger.LogInformation("PCloudController UploadFile - formCount: {count}", form?.Count);
+
             if (form != null && form.Count > 0)
             {
                 long folderId = long.Parse(form["Folder"]!);
@@ -65,9 +86,12 @@ namespace FiDa.Controllers
 
                         var fileMeta = res.metadata!.First();
 
-                        _db.UploadedFiles.Add(new UploadedFile
+                        _db.UploadedFiles.AddRangeAsync(new UploadedFile
                         {
+                            AccountId = _currentUser.Id,
+                            Account = _currentUser,
                             FileName = file.FileName,
+                            HostId = _host.Id,
                             Host = _host,
                             FileId = res.fileids!.First().ToString(),
                             Size = !fileMeta.isfolder ? fileMeta.size / 1000 : null,
@@ -75,7 +99,10 @@ namespace FiDa.Controllers
                             IsFolder = false,
                             Modified = fileMeta.modified,
                             Created = fileMeta.created
-                        });
+                        }).Wait();
+
+                        _db.Account.Update(_currentUser);
+                        _db.UserHost.Update(_host);
                     }
                     catch (Exception e)
                     {
@@ -83,10 +110,9 @@ namespace FiDa.Controllers
                         errors.Add($"File upload failed for file: {file.FileName}");
                     }
                 }
-                _db.SaveChanges();
+                _db.SaveChangesAsync().Wait();
 
                 TempData["Errors"] = errors;
-
             }
             return RedirectToAction("Index");
         }
@@ -96,35 +122,38 @@ namespace FiDa.Controllers
         [Authorize]
         public async Task<ActionResult> SyncRepo()
         {
-            // Clear current db entries for pcloud host
-            var currentEntries = _db.UploadedFiles.Where((f) => f.Host == _host && f.Account == _currentUser);
-            _db.UploadedFiles.RemoveRange(currentEntries);
+            _logger.LogInformation("PCloudController SyncRepo");
 
-            ListFolderRequest req = new(0, true);
+            // Clear current db entries for pcloud host
+            var existingFiles = _db.UploadedFiles.Where(f => f.AccountId == _currentUser.Id && f.Host == _host);
+            _db.UploadedFiles.RemoveRange(existingFiles);
+
+            ListFolderRequest req = new(folderId: 0, recursive: true);
             var res = _pClient.Folders.ListFolder(req).Result;
 
             if (res == null || (res.result != 0 && res.error != null)) throw new Exception("Could not Syncronize: " + res?.error);
 
-            var contents = res.metadata!.contents;
+            var contents = res.metadata?.contents;
 
             if (contents != null)
             {
-                List<UploadedFile> inserts = new();
-                foreach (var meta in contents)
+                var inserts = contents.Select(meta => new UploadedFile
                 {
-                    inserts.Add(new UploadedFile
-                    {
-                        FileName = meta.name,
-                        Host = _host,
-                        FileId = meta.isfolder ? meta.folderid.ToString()! : meta.fileid.ToString()!,
-                        ParentFolderId = meta.parentfolderid.ToString(),
-                        Size = meta.size / 1000,
-                        IsFolder = meta.isfolder,
-                        Modified = meta.modified,
-                        Created = meta.created
-                    });
-                }
+                    AccountId = _currentUser.Id,
+                    Account = _currentUser,
+                    FileName = meta.name,
+                    HostId = _host.Id,
+                    Host = _host,
+                    FileId = meta.isfolder ? meta.folderid.ToString()! : meta.fileid.ToString()!,
+                    ParentFolderId = meta.parentfolderid.ToString(),
+                    Size = meta.size / 1000,
+                    IsFolder = meta.isfolder,
+                    Modified = meta.modified,
+                    Created = meta.created
+                });
 
+                _db.Account.Update(_currentUser);
+                _db.UserHost.Update(_host);
                 await _db.UploadedFiles.AddRangeAsync(inserts);
                 await _db.SaveChangesAsync();
             }
