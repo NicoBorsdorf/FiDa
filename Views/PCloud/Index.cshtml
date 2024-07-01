@@ -1,6 +1,11 @@
-@model FiDa.ViewModels.FileViewModel
+@model FiDa.ViewModels.BaseViewModel
 @{
 	ViewData["Title"] = "pCloud";
+
+	var fileModel = Model.FileViewModel ?? throw new ArgumentNullException("FileViewModel");
+	var rootFiles = fileModel.RootFiles;
+	var folders = fileModel.Folders;
+
 }
 
 <div class="p-4">
@@ -41,40 +46,38 @@
 				</tr>
 			</thead>
 			<tbody>
-				@foreach (var file in Model.RootFiles)
+				@foreach (var file in rootFiles)
 				{
-					<tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-						<td class="p-4 max-w-5">
-							@if (file.IsFolder)
-							{
+					@if (file.IsFolder)
+					{
+						<tr class="border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-600 hover:cursor-pointer" onclick="location.href='@Url.Action("Index", "PCloud", new { id = file.FileId})'">
+							<td class="p-4 max-w-5">
 								<svg fill="currentColor" width="2rem" height="2rem" viewBox="0 0 35 35" version="1.1" xmlns="http://www.w3.org/2000/svg">
 									<title>folder</title>
 									<path d="M8.431 9.155h20.958c2.158 0 2.158-2.238 0.084-2.238h-14.486c-0.83 0-1.244-1.244-1.244-1.244s-0.581-1.825-1.743-1.825h-10.789c-1.576 0-1.162 1.825-1.162 1.825s2.407 20.47 2.573 21.715 1.453 1.612 1.453 1.612l2.821-18.103c0.208-1.327 1.12-1.7 1.535-1.742zM33.658 9.942h-24.563c-0.733 0-1.328 0.594-1.328 1.327l-2.572 16.4c0 0.734 0.595 1.328 1.328 1.328h24.563c0.732 0 1.328-0.594 1.328-1.328l2.572-16.4c0-0.733-0.593-1.327-1.328-1.327z"></path>
 								</svg>
-							}
-							else
-							{
+							</td>
+							<td class="p-4">@Html.DisplayFor(modelitem => file.FileName)</td>
+							<td class="p-4 max-w-2">@Html.DisplayFor(modelitem => file.Size)</td>
+							<td class="p-4 max-w-4">@Html.DisplayFor(modelitem => file.Modified)</td>
+							<td class="p-4 max-w-4">@Html.DisplayFor(modelitem => file.Created)</td>
+						</tr>
+					}
+					else
+					{
+						<tr class="border-b dark:bg-gray-800 dark:border-gray-700">
+							<td class="p-4 max-w-5">
 								<svg fill="currentColor" width="2rem" height="2rem" viewBox="0 0 32 32" version="1.1" xmlns="http://www.w3.org/2000/svg">
 									<title>file2</title>
 									<path d="M11 15h1v-1h-1v1zM11 18h1v-1h-1v1zM11 12h1v-1h-1v1zM11 21h1v-1h-1v1zM11 24h1v-1h-1v1zM13 18h8v-1h-8v1zM13 12h8v-1h-8v1zM20.938 4h-13.938v24h18v-20l-4.062-4zM23 25.938h-14v-19.938h10v2.938h4v17zM13 21h8v-1h-8v1zM13 15h8v-1h-8v1zM13 24h8v-1h-8v1z"></path>
 								</svg>
-							}
-
-						</td>
-						<td class="p-4">
-							@if (file.IsFolder)
-							{
-								@Html.ActionLink(file.FileName, "Index", "PCloud", file.FileId)
-							}
-							else
-							{
-								@Html.DisplayFor(modelitem => file.FileName)
-							}
-						</td>
-						<td class="p-4">@Html.DisplayFor(modelitem => file.Size)</td>
-						<td class="p-4 max-w-4">@Html.DisplayFor(modelitem => file.Modified)</td>
-						<td class="p-4 max-w-4">@Html.DisplayFor(modelitem => file.Created)</td>
-					</tr>
+							</td>
+							<td class="p-4">@Html.DisplayFor(modelitem => file.FileName)</td>
+							<td class="p-4 max-w-2">@Html.DisplayFor(modelitem => file.Size)</td>
+							<td class="p-4 max-w-4">@Html.DisplayFor(modelitem => file.Modified)</td>
+							<td class="p-4 max-w-4">@Html.DisplayFor(modelitem => file.Created)</td>
+						</tr>
+					}
 				}
 			</tbody>
 		</table>
@@ -126,7 +129,7 @@
 						<label for="Folder" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Select a Folder</label>
 						<select id="Folder" name="Folder" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
 							<option selected value="0">Root</option>
-							@foreach (var folder in Model.Folders)
+							@foreach (var folder in folders)
 							{
 								<option selected value="@folder.FileId">@folder.FileName</option>
 							}
