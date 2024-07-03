@@ -18,4 +18,11 @@ namespace FiDa.ViewModels
     {
         public string RequestId { get; set; }
     }
+
+    public class StorageUsageModel
+    {
+        public UserHost Host { get; set; }
+        public double Free { get; set; }
+        public double Used { get; set; }
+    }
 }
