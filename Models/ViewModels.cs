@@ -16,12 +16,12 @@ namespace FiDa.ViewModels
 
     public class ErrorViewModel
     {
-        public string RequestId { get; set; }
+        public string RequestId { get; set; } = string.Empty;
     }
 
     public class StorageUsageModel
     {
-        public UserHost Host { get; set; }
+        public UserHost Host { get; set; } = null!;
         public double Free { get; set; }
         public double Used { get; set; }
     }

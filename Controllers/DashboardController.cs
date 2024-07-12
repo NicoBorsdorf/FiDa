@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 using FiDa.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using FiDa.DatabaseModels;
+using FiDa.Database;
+using Microsoft.EntityFrameworkCore;
 using FiDa.Lib;
 
 namespace FiDa.Controllers;
@@ -11,11 +13,12 @@ public class DashboardController : Controller
 {
     private readonly Account _currentUser;
     private readonly ILogger _logger;
+    private readonly FiDaDatabase _db = new(new());
 
     public DashboardController(ILogger<DashboardController> logger, IHttpContextAccessor contextAccessor)
     {
         _logger = logger;
-        _currentUser = Utils.GetAccount(contextAccessor.HttpContext?.User.Identity?.Name!, includeHosts: true);
+        _currentUser = Utils.GetAccount(contextAccessor.HttpContext?.User.Identity?.Name!);
 
         _logger.LogInformation("New Instance DashboardController");
     }
@@ -23,10 +26,10 @@ public class DashboardController : Controller
     [Authorize]
     public IActionResult Index()
     {
-        _logger.LogInformation("Dashboard Index");
+        _logger.LogInformation("Dashboard - Index");
 
         _logger.LogDebug("_currentUser: {username}", _currentUser.Username);
-        _logger.LogDebug("hosts: {username}", string.Join(", ", _currentUser.ConfiguredHosts));
+        _logger.LogDebug("hosts: {hosts}", string.Join(", ", _currentUser.ConfiguredHosts));
         var modle = new BaseViewModel
         {
             Account = _currentUser
@@ -37,7 +40,7 @@ public class DashboardController : Controller
     //[Authorize]
     public IActionResult Privacy()
     {
-        _logger.LogInformation("Dashboard Privacy");
+        _logger.LogInformation("Dashboard - Privacy");
 
         return View();
     }
@@ -45,7 +48,7 @@ public class DashboardController : Controller
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     public IActionResult Error()
     {
-        _logger.LogInformation("Dashboard Error");
+        _logger.LogInformation("Dashboard - Error");
 
         return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
     }

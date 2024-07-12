@@ -1,6 +1,7 @@
 ﻿@model FiDa.ViewModels.BaseViewModel
 @{
-	var account = Model.Account;
+	var account = Model.Account ?? throw new ArgumentNullException("Account");
+	var hosts = account.ConfiguredHosts;
 }
 <!DOCTYPE html>
 <html lang="en">
@@ -30,9 +31,9 @@
 	<div class="flex min-h-full min-w-full">
 		<nav class="border-r-2 border-slate-600 h-screen min-w-72 p-6">
 			<div class="grid grid-cols-1 gap-2">
-				@foreach (var userHost in account.ConfiguredHosts)
+				@foreach (var userHost in hosts)
 				{
-					<a key="@userHost.Host" href="@userHost.Host.ToString().ToLower()"
+					<a key="@userHost.Host" href="@Url.ActionLink("Index", @userHost.Host.ToString())"
 				   class=" text-xl font-semibold hover:bg-slate-600 p-2 hover:cursor-pointer rounded-md active:ring-2 active:bg-slate-600 focus-within:bg-slate-600 focus-within:ring-2 ring-slate-200">
 						<div class="flex justify-between">
 							@userHost.Host.ToString()
@@ -61,7 +62,7 @@
 					<ul class="py-2 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownDefaultButton">
 						@foreach (var host in (FiDa.DatabaseModels.Hosts[])Enum.GetValues(typeof(FiDa.DatabaseModels.Hosts)))
 						{
-							if (account.ConfiguredHosts.FirstOrDefault((h) => h.Host == host) == null)
+							if (hosts.FirstOrDefault((h) => h.Host == host) == null)
 							{
 								<li>
 									<a href="/config/@host.ToString().ToLower()" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">@host.ToString()</a>

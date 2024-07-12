@@ -10,6 +10,7 @@ using pcloud_sdk_csharp.Folder.Requests;
 
 namespace FiDa.Controllers
 {
+    [Route("pcloud/[action]")]
     public class PCloudController : Controller
     {
         private readonly FiDaDatabase _db = new(options: new());
@@ -41,7 +42,6 @@ namespace FiDa.Controllers
 
 
         [Authorize]
-        [HttpGet("{id}")]
         public ActionResult Index(long? id)
         {
             _logger.LogInformation("PCloudController Index - folderId: {folderId}", id);
@@ -64,12 +64,14 @@ namespace FiDa.Controllers
 
         [Authorize]
         [HttpPost]
-        public ActionResult UploadFile(IFormCollection? form)
+        public async Task<ActionResult> UploadFile(IFormCollection? form)
         {
             _logger.LogInformation("PCloudController UploadFile - formCount: {count}", form?.Count);
 
             if (form != null && form.Count > 0)
             {
+                if (!_db.UploadedFiles.Where((f) => f.Account == _currentUser && f.Host == _host).Any()) await SyncRepo();
+
                 long folderId = long.Parse(form["Folder"]!);
                 IFormFile[] files = form.Files.ToArray();
 
@@ -80,7 +82,7 @@ namespace FiDa.Controllers
                     try
                     {
                         UploadFileRequest req = new(folderId, file.FileName, file.OpenReadStream());
-                        var res = _pClient.Files.UploadFile(req).Result;
+                        var res = await _pClient.Files.UploadFile(req);
 
                         if (null == res || (res.result != 0 && res.error != null)) throw new Exception("PCloud returned an exception: " + res?.error);
 
