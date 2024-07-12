@@ -79,7 +79,7 @@ namespace FiDa.DatabaseModels
         public DateTime Created { get; }
     }
 
-    [Index(nameof(Id), IsUnique = true)]
+    [Index(nameof(Id), nameof(AccountId), nameof(Host), IsUnique = true)]
     public class UserHost
     {
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -92,6 +92,12 @@ namespace FiDa.DatabaseModels
 
         [Required(ErrorMessage = "A Api key must be provided.")]
         public string ApiKey { get; set; } = string.Empty;
+
+        // Needed for dropbox
+        public string? RefreshToken { get; set; }
+        public string? AppKey { get; set; }
+        public string? AppSecret { get; set; }
+        public DateTime? TokenExpiration { get; set; }
 
         [NotMapped]
         public Uri? HostAddress
