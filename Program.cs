@@ -1,6 +1,6 @@
 using FiDa.Database;
-using Microsoft.EntityFrameworkCore;
 using Auth0.AspNetCore.Authentication;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 var config = builder.Configuration;
@@ -28,30 +28,18 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
+    var logger = services.GetRequiredService<ILogger<Program>>();
+    var dbContext = services.GetRequiredService<FiDaDatabase>();
+
+    try
     {
-        var logger = services.GetRequiredService<ILogger<Program>>();
-        var dbContext = services.GetRequiredService<FiDaDatabase>();
-
-        //dbContext.Database.EnsureDeleted();
-        //dbContext.Database.EnsureCreated();
-
-        var pendingMigrations = dbContext.Database.GetPendingMigrations();
-        if (pendingMigrations.Any())
-        {
-            try
-            {
-                logger.LogDebug("Applying pending migrations: {migrations}", string.Join(", ", pendingMigrations));
-                dbContext.Database.Migrate();
-            }
-            catch (Exception ex)
-            {
-                logger.LogError(ex, "An error occurred while migrating or seeding the database.");
-            }
-        }
-        else
-        {
-            logger.LogDebug("No pending migrations.");
-        }
+        logger.LogInformation("Applying migrations...");
+        await dbContext.Database.MigrateAsync();
+        logger.LogInformation("Migrations applied successfully.");
+    }
+    catch (Exception ex)
+    {
+        logger.LogError(ex, "An error occurred while migrating the database.");
     }
 }
 
@@ -73,6 +61,17 @@ app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Dashboard}/{action=Index}");
+    pattern: "{controller=Dashboard}/{action=Index}/{id?}",
+    defaults: new { controller = "Dashboard" });
+
+app.MapControllerRoute(
+    name: "pcloud",
+    pattern: "pcloud/{action=Index}/{id?}",
+    defaults: new { controller = "PCloud" });
+
+app.MapControllerRoute(
+    name: "dropbox",
+    pattern: "dropbox/{action=Index}/{id?}",
+    defaults: new { controller = "Dropbox" });
 
 app.Run();
