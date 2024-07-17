@@ -74,7 +74,7 @@ namespace FiDa.Controllers
                         var args = new UploadArg(path: string.IsNullOrEmpty(folder) ? $"/{file.FileName}" : folder, autorename: true);
                         var res = await _dropboxClient.Files.UploadAsync(args, file.OpenReadStream()) ?? throw new Exception("Dropbox upload file returned null.");
 
-                        _db.UploadedFiles.Add(new UploadedFile
+                        await _db.UploadedFiles.AddAsync(new UploadedFile
                         {
                             FileName = res.Name,
                             Account = _currentUser,
@@ -111,6 +111,7 @@ namespace FiDa.Controllers
 
             var existingFiles = _db.UploadedFiles.Where(f => f.Account == _currentUser && f.Host == _host);
             _db.UploadedFiles.RemoveRange(existingFiles);
+            await _db.SaveChangesAsync();
 
             var dropBoxContent = await _dropboxClient.Files.ListFolderAsync(new ListFolderArg(path: "", recursive: true)) ?? throw new Exception("Dropbox list folder returned null.");
 
@@ -129,9 +130,9 @@ namespace FiDa.Controllers
                 Size = e.IsFile ? e.AsFile.Size : null
             });
 
-            await _db.UploadedFiles.AddRangeAsync(inserts);
             _db.Account.Update(_currentUser);
             _db.UserHost.Update(_host);
+            await _db.UploadedFiles.AddRangeAsync(inserts);
             await _db.SaveChangesAsync();
 
             return RedirectToAction("Index");

@@ -36,8 +36,8 @@ namespace FiDa.Controllers
             }
 
             // throw if token is null is already implemented in SDK
-            _pClient = new PCloudClient(_host.ApiKey, _host.HostAddress);
             _logger.LogInformation("PCloudController - create pcloud api client");
+            _pClient = new PCloudClient(_host.ApiKey, _host.HostAddress);
         }
 
 
