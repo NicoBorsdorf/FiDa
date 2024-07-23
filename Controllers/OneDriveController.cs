@@ -1,5 +1,3 @@
-
-using System.Web;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FiDa.Controllers

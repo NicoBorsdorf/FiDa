@@ -1,5 +1,5 @@
-using FiDa.Database;
 using Auth0.AspNetCore.Authentication;
+using FiDa.Database;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -61,7 +61,7 @@ app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Dashboard}/{action=Index}/{id?}",
+    pattern: "{controller=Dashboard}/{action=Index}",
     defaults: new { controller = "Dashboard" });
 
 app.MapControllerRoute(
