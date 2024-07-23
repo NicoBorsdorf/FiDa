@@ -25,4 +25,9 @@ namespace FiDa.ViewModels
         public double Free { get; set; }
         public double Used { get; set; }
     }
+
+    public class DeleteHostModel
+    {
+        public UserHost Host { get; set; } = null!;
+    }
 }
