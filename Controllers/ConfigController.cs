@@ -1,12 +1,11 @@
-﻿using FiDa.Database;
+﻿using Dropbox.Api;
+using FiDa.Database;
 using FiDa.DatabaseModels;
-using FiDa.Lib;
+using FiDa.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using pcloud_sdk_csharp.Auth.Requests;
 using pcloud_sdk_csharp.Auth.Controller;
-using FiDa.ViewModels;
-using Dropbox.Api;
+using pcloud_sdk_csharp.Auth.Requests;
 
 namespace FiDa.Controllers
 {
@@ -23,7 +22,8 @@ namespace FiDa.Controllers
 
             ViewData["Title"] = "Config";
 
-            _currentUser = Utils.GetAccount(contextAccessor.HttpContext?.User.Identity?.Name!);
+            var uName = contextAccessor.HttpContext?.User.Identity?.Name ?? throw new ArgumentNullException("Username");
+            _currentUser = _db.Account.FirstOrDefault(a => a.Username == uName) ?? throw new Exception($"No Account for {uName} found on database");
         }
 
         // PCloud API
@@ -63,7 +63,7 @@ namespace FiDa.Controllers
         }
 
         [Authorize]
-        public ActionResult PCloud_Authenticate_Redirect()
+        public async Task<ActionResult> PCloud_Authenticate_Redirect()
         {
             _logger.LogInformation("ConfigController - PCloud_Authenticate_Redirect");
 
@@ -72,19 +72,19 @@ namespace FiDa.Controllers
             var hostname = query.GetValueOrDefault("hostname").ToString() ?? throw new ArgumentNullException("hostname");
             var hostUri = new Uri("https://" + hostname + "/");
 
-            var access_token = Authorize.GetOAuthToken((string)TempData["client_id"]!, (string)TempData["client_secret"]!, code, hostUri)?.Result?.access_token ?? throw new ArgumentNullException("access_token");
+            var authResponse = await Authorize.GetOAuthToken((string)TempData["client_id"]!, (string)TempData["client_secret"]!, code, hostUri) ?? throw new Exception("PCloud API returned null.");
 
             _currentUser.ConfiguredHosts.Add(new UserHost
             {
                 Account = _currentUser,
                 AccountId = _currentUser.Id,
-                ApiKey = access_token,
+                ApiKey = authResponse.access_token ?? throw new ArgumentNullException("access_token"),
                 Host = Hosts.PCloud,
                 HostAddress = hostUri
             });
 
             _db.Account.Update(_currentUser);
-            _db.SaveChangesAsync().Wait();
+            await _db.SaveChangesAsync();
 
             TempData.Clear();
 
@@ -123,7 +123,7 @@ namespace FiDa.Controllers
         }
 
         [Authorize]
-        public ActionResult Dropbox_Authenticate_Redirect()
+        public async Task<ActionResult> Dropbox_Authenticate_RedirectAsync()
         {
             _logger.LogInformation("ConfigController - Dropbox_Authenticate_Redirect");
 
@@ -131,7 +131,7 @@ namespace FiDa.Controllers
             var code = query.GetValueOrDefault("code").ToString() ?? throw new ArgumentNullException("code");
 
             var redirectUri = $"{Request.Scheme}://{Request.Host}/config/dropbox_authenticate_redirect";
-            var authResponse = DropboxOAuth2Helper.ProcessCodeFlowAsync(code, appKey: (string)TempData["client_id"]!, appSecret: (string)TempData["client_secret"]!, redirectUri).Result ?? throw new Exception("Dropbox code flow returned null.");
+            var authResponse = await DropboxOAuth2Helper.ProcessCodeFlowAsync(code, appKey: (string)TempData["client_id"]!, appSecret: (string)TempData["client_secret"]!, redirectUri) ?? throw new Exception("Dropbox code flow returned null.");
 
             var newUserHost = new UserHost
             {
@@ -146,11 +146,10 @@ namespace FiDa.Controllers
                 HostAddress = new Uri("https://api.dropbox.com")
             };
 
-            _db.UserHost.Add(newUserHost);
-            //_currentUser.ConfiguredHosts.Add(newUserHost);
-
+            _currentUser.ConfiguredHosts.Add(newUserHost);
+            //await _db.UserHost.AddAsync(newUserHost);
             _db.Account.Update(_currentUser);
-            _db.SaveChangesAsync().Wait();
+            await _db.SaveChangesAsync();
 
             TempData.Clear();
 

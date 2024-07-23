@@ -1,11 +1,11 @@
 using FiDa.Database;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Authorization;
 using FiDa.DatabaseModels;
 using FiDa.ViewModels;
-using FiDa.Lib;
-using pcloud_sdk_csharp.File.Requests;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using pcloud_sdk_csharp.Client;
+using pcloud_sdk_csharp.File.Requests;
 using pcloud_sdk_csharp.Folder.Requests;
 
 namespace FiDa.Controllers
@@ -26,7 +26,8 @@ namespace FiDa.Controllers
 
             ViewData["Title"] = "PCloud";
 
-            _currentUser = Utils.GetAccount(contextAccessor.HttpContext?.User.Identity?.Name!);
+            var uName = contextAccessor.HttpContext?.User.Identity?.Name ?? throw new ArgumentNullException("Username");
+            _currentUser = _db.Account.Include(a => a.ConfiguredHosts).FirstOrDefault(a => a.Username == uName) ?? throw new Exception($"No Account for {uName} found on database");
 
             _host = _currentUser.ConfiguredHosts.FirstOrDefault((h) => h.Host == Hosts.PCloud)!;
             if (null == _host)

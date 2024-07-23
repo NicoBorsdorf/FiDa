@@ -1,11 +1,10 @@
-using System.Diagnostics;
-using Microsoft.AspNetCore.Mvc;
+using FiDa.Database;
+using FiDa.DatabaseModels;
 using FiDa.ViewModels;
 using Microsoft.AspNetCore.Authorization;
-using FiDa.DatabaseModels;
-using FiDa.Database;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using FiDa.Lib;
+using System.Diagnostics;
 
 namespace FiDa.Controllers;
 
@@ -18,9 +17,11 @@ public class DashboardController : Controller
     public DashboardController(ILogger<DashboardController> logger, IHttpContextAccessor contextAccessor)
     {
         _logger = logger;
-        _currentUser = Utils.GetAccount(contextAccessor.HttpContext?.User.Identity?.Name!);
-
         _logger.LogInformation("New Instance DashboardController");
+
+        var uName = contextAccessor.HttpContext?.User.Identity?.Name ?? throw new ArgumentNullException("Username");
+        _currentUser = _db.Account.Include(a => a.ConfiguredHosts).FirstOrDefault(a => a.Username == uName) ?? throw new Exception($"No Account for {uName} found on database");
+
     }
 
     [Authorize]
@@ -28,8 +29,6 @@ public class DashboardController : Controller
     {
         _logger.LogInformation("Dashboard - Index");
 
-        _logger.LogDebug("_currentUser: {username}", _currentUser.Username);
-        _logger.LogDebug("hosts: {hosts}", string.Join(", ", _currentUser.ConfiguredHosts));
         var modle = new BaseViewModel
         {
             Account = _currentUser
