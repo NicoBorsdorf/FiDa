@@ -1,109 +1,103 @@
 ﻿@model FiDa.ViewModels.BaseViewModel
 @{
-	var account = Model.Account ?? throw new ArgumentNullException("Account");
-	var hosts = account.ConfiguredHosts;
+    var account = Model.Account ?? throw new ArgumentNullException("Account");
+    var hosts = account.ConfiguredHosts;
 }
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
-	<meta charset="utf-8" />
-	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-	<title>@ViewData["Title"] - FiDa</title>
-	<script src="https://cdn.tailwindcss.com"></script>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - FiDa</title>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
 <body class="bg-slate-900 text-slate-200 dark">
-	<header class="border-slate-600 border-b-2 flex h-full items-center">
-		<div class="font-bold text-3xl h-full border-slate-600  w-72 border-r-2 px-8 flex items-center justify-center">
-			<a href="/" class="flex items-center justify-center hover:bg-slate-600 rounded-lg p-4">
-				FiDa
-			</a>
-		</div>
-		<div class="m-auto text-2xl font-semibold">Organize Your Files</div>
-		<div class="my-auto px-6">
-			<button id="avatarButton" type="button" popovertarget="userDropdown">
-				<img class="w-10 h-10 rounded-full" src="/Public/Avatar.png" alt="CN" width="100" height="100" />
-			</button>
+    <header class="border-slate-600 border-b-2 flex h-full items-center">
+        <div class="font-bold text-3xl h-full border-slate-600  w-72 border-r-2 px-8 flex items-center justify-center">
+            <a href="/" class="flex items-center justify-center hover:bg-slate-600 rounded-lg p-4">
+                FiDa
+            </a>
+        </div>
+        <div class="m-auto text-2xl font-semibold">Organize Your Files</div>
+        <div class="my-auto px-6">
+            <button id="avatarButton" type="button" popovertarget="userDropdown">
+                <img class="w-10 h-10 rounded-full" src="/Public/Avatar.png" alt="CN" width="100" height="100" />
+            </button>
 
-			<!-- Dropdown menu -->
-			<div popover="manual" id="userDropdown" name="userDropdown" class="z-10 bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700 dark:divide-gray-600">
-				<div class="px-4 py-3 text-sm text-gray-900 dark:text-white">
-					<div>@Model.Account.Username</div>
-				</div>
-				<div class="py-1">
-					<a href="@Url.Action("Logout","Account")" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white">Sign out</a>
-				</div>
-			</div>
+            <!-- Dropdown menu -->
+            <div popover="manual" id="userDropdown" name="userDropdown" class="z-10 bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700 dark:divide-gray-600">
+                <div class="px-4 py-3 text-sm text-gray-900 dark:text-white">
+                    <div>@Model.Account.Username</div>
+                </div>
+                <div class="py-1">
+                    <a href="@Url.Action("Logout","Account")" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white">Sign out</a>
+                </div>
+            </div>
 
 
-		</div>
-	</header>
+        </div>
+    </header>
 
-	<div class="flex min-h-full min-w-full">
-		<nav class="border-r-2 border-slate-600 h-screen min-w-72 p-6">
-			<div class="grid grid-cols-1 gap-2">
-				@foreach (var userHost in hosts)
-				{
-					<a key="@userHost.Host" href="@Url.ActionLink("Index", @userHost.Host.ToString())"
-				   class="text-xl font-semibold hover:bg-slate-600 p-2 hover:cursor-pointer rounded-md active:ring-2 active:bg-slate-600 focus-within:bg-slate-600 focus-within:ring-2 ring-slate-200 group">
-						<div class="flex justify-between">
-							@userHost.Host.ToString()
-							@if (@userHost.Files != null)
-							{
-								<div class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-[#2563eb] text-[#f8fafc] hover:bg-[#2563eb]/80">
-									@userHost.Files.Count
-								</div>
-							}
-						</div>
-					</a>
-				}
-				<button key="newHost" onclick="toggleDropdown()" class="bg-blue-600 text-xl font-semibold hover:bg-blue-400 p-2 hover:cursor-pointer rounded-md active:ring-2 active:bg-blue-800 focus-within:bg-blue-800 focus-within:ring-2 ring-slate-200">
-					<div class="flex justify-between items-center">
-						<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 24 24" overflow="visible" xml:space="preserve" class="size-6">
-						<g id="Icon" fill="currentColor">
-						<path d="M21,13h-8v8h-2v-8H3v-2h8V3h2v8h8V13z" />
+    <div class="flex min-h-full min-w-full">
+        <nav class="border-r-2 border-slate-600 h-screen min-w-72 p-6">
+            <div class="grid grid-cols-1 gap-2">
+                @foreach (var userHost in hosts)
+                {
+                    <a key="@userHost.Host" href="@Url.ActionLink("Index", @userHost.Host.ToString())"
+                       class="text-xl font-semibold hover:bg-slate-600 p-2 hover:cursor-pointer rounded-md active:ring-2 active:bg-slate-600 focus-within:bg-slate-600 focus-within:ring-2 ring-slate-200 group">
+                        <div class="flex justify-between">
+                            @userHost.Host.ToString()
+                        </div>
+                    </a>
+                }
+                <button key="newHost" onclick="toggleDropdown()" class="bg-blue-600 text-xl font-semibold hover:bg-blue-400 p-2 hover:cursor-pointer rounded-md active:ring-2 active:bg-blue-800 focus-within:bg-blue-800 focus-within:ring-2 ring-slate-200">
+                    <div class="flex justify-between items-center">
+                        <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 24 24" overflow="visible" xml:space="preserve" class="size-6">
+                        <g id="Icon" fill="currentColor">
+                        <path d="M21,13h-8v8h-2v-8H3v-2h8V3h2v8h8V13z" />
 						</g>
 						</svg>
-						Configure a new Host
-					</div>
-				</button>
+                        Configure a new Host
+                    </div>
+                </button>
 
-				<!-- Dropdown menu -->
-				<div id="dropdown" class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700">
-					<ul class="py-2 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownDefaultButton">
-						@foreach (var host in (FiDa.DatabaseModels.Hosts[])Enum.GetValues(typeof(FiDa.DatabaseModels.Hosts)))
-						{
-							if (hosts.FirstOrDefault((h) => h.Host == host) == null)
-							{
-								<li>
-									<a href="/config/@host.ToString().ToLower()" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">@host.ToString()</a>
-								</li>
-							}
-						}
-					</ul>
-				</div>
+                <!-- Dropdown menu -->
+                <div id="dropdown" class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700">
+                    <ul class="py-2 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownDefaultButton">
+                        @foreach (var host in (FiDa.DatabaseModels.Hosts[])Enum.GetValues(typeof(FiDa.DatabaseModels.Hosts)))
+                        {
+                            if (hosts.FirstOrDefault((h) => h.Host == host) == null)
+                            {
+                                <li>
+                                    <a href="/config/@host.ToString().ToLower()" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">@host.ToString()</a>
+                                </li>
+                            }
+                        }
+                    </ul>
+                </div>
 
 
-			</div>
-		</nav>
-		<main role="main" class="min-h-full p-4 w-full">
-			@RenderBody()
-		</main>
-	</div>
+            </div>
+        </nav>
+        <main role="main" class="min-h-full p-4 min-w-full">
+            @RenderBody()
+        </main>
+    </div>
 
-	<footer class="border-t-2 border-slate-600 p-10">
-		<div class="text-xl h-full flex items-center justify-center">
-			&copy; All rights reserved.
-		</div>
-	</footer>
+    <footer class="border-t-2 border-slate-600 p-10">
+        <div class="text-xl h-full flex items-center justify-center">
+            &copy; All rights reserved.
+        </div>
+    </footer>
 
-	<script type="text/javascript">
-		function toggleDropdown() {
-			const e = document.getElementById("dropdown");
-			e.classList.contains("hidden") ? e.classList.remove("hidden") : e.classList.add("hidden");
-		}
-	</script>
+    <script type="text/javascript">
+        function toggleDropdown() {
+            const e = document.getElementById("dropdown");
+            e.classList.contains("hidden") ? e.classList.remove("hidden") : e.classList.add("hidden");
+        }
+    </script>
 
 </body>
 
