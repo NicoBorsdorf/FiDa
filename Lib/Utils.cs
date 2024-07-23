@@ -12,7 +12,7 @@ namespace FiDa.Lib
         {
             await _db.AddAsync(account);
             await _db.SaveChangesAsync();
-            return account;
+            return await _db.Account.FirstAsync(a => a == account);
         }
 
         /// <summary>
@@ -26,7 +26,38 @@ namespace FiDa.Lib
         {
             if (string.IsNullOrEmpty(uName)) throw new ArgumentNullException(nameof(uName));
 
-            return _db.Account.Include(a => a.ConfiguredHosts).ThenInclude(u => u.Files).FirstOrDefault((a) => a.Username == uName) ?? AddAccount(new Account(uName)).Result;
+            return _db.Account.Include(a => a.ConfiguredHosts).FirstOrDefault((a) => a.Username == uName) ?? AddAccount(new Account(uName)).Result;
+        }
+
+        /// <summary>
+        /// Deletes a user host from database
+        /// </summary>
+        /// <param name="host">User host to remove.</param>
+        /// <param name="_logger">Logger of corresponding controller.</param>
+        /// <returns>Bool if successfull or not.</returns>
+        public static async Task<bool> DeleteHost(UserHost host, ILogger _logger)
+        {
+            _logger.LogInformation("Utils - DeleteHost");
+            try
+            {
+                var toRemove = await _db.UserHost.FindAsync(host.Id);
+                if (toRemove == null)
+                {
+                    _logger.LogError("Host {host} of {name} not found", host.Host, host.Account.Username);
+                    return false;
+                }
+                _db.UserHost.Remove(toRemove);
+                await _db.SaveChangesAsync();
+
+                _logger.LogInformation("Host {host} of user {name} has been removed.", host.Host, host.Account.Username);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while removing the host");
+                return false;
+            }
+
+            return true;
         }
     }
 }
